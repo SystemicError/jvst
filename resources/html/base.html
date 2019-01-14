@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Welcome to jvst</title>
+    <title>Welcome to the Japanese Vocabulary Size Test</title>
 
     <!-- styles -->
     {% style "/assets/bootstrap/css/bootstrap.min.css" %}
@@ -29,6 +29,11 @@
                       home
                       </a>
                   </li>
+                  <li class="nav-item">
+                      <a href="/test"
+                         class="nav-link{% ifequal page "test.html" %} active{%endifequal%}">
+                      test 
+                      </a>
                   <li class="nav-item">
                       <a href="/about"
                          class="nav-link{% ifequal page "about.html" %} active{%endifequal%}">
