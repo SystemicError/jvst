@@ -34,10 +34,15 @@ UPDATE users
 SET survey_results = :survey_results
 WHERE id = :id
 
--- :name get-user :? :1
+-- :name get-user-by-id :? :1
 -- :doc retrieves a user record given the id
 SELECT * FROM users
 WHERE id = :id
+
+-- :name get-user-by-email :? :1
+-- :doc retrieves a user record given email
+SELECT * FROM users
+WHERE email = :email
 
 -- :name delete-user! :! :n
 -- :doc deletes a user record given the id

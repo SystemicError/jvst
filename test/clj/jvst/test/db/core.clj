@@ -36,7 +36,19 @@
             :question_set_queue nil
             :vocab_queries nil
             :survey_results nil}
-           (db/get-user t-conn {:id "1"})))
+           (db/get-user-by-id t-conn {:id "1"})))
+    (is (= {:id         "1"
+            :first_name "Sam"
+            :last_name  "Smith"
+            :email      "sam.smith@example.com"
+            :pass       "pass"
+            :admin      nil
+            :last_login nil
+            :is_active  nil
+            :question_set_queue nil
+            :vocab_queries nil
+            :survey_results nil}
+           (db/get-user-by-email t-conn {:email "sam.smith@example.com"})))
     (is (= 1 (db/update-user!
                t-conn
                {:id         "1"
@@ -70,11 +82,11 @@
             :question_set_queue "test results"
             :vocab_queries "vocab queries"
             :survey_results "survey results"}
-           (db/get-user t-conn {:id "1"})))
+           (db/get-user-by-id t-conn {:id "1"})))
     (is (= 1 (db/delete-user!
                t-conn
                {:id "1"})))
-    (is (= nil (db/get-user
+    (is (= nil (db/get-user-by-id
                t-conn
                {:id "1"})))
     ))
