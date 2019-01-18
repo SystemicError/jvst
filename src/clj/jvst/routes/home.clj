@@ -1,7 +1,7 @@
 (ns jvst.routes.home
   (:require [jvst.layout :as layout]
             [jvst.db.core :as db]
-            [compojure.core :refer [defroutes GET]]
+            [compojure.core :refer :all]
             [ring.util.http-response :as response]
             [clojure.java.io :as io]
             [buddy.hashers :as hashers]
@@ -15,14 +15,6 @@
 
 (defn get-user [email]
   (db/get-user {:email email}))
-
-(defn add-user! [email password first-name last-name]
-  (if (get-user (str/lower-case email))
-    (throw (Exception. "User with that email already exists!"))
-    (db/create-user! {:email (str/lower-case email)
-                      :password password
-                      :first-name first-name
-                      :last-name last-name})))
 
 ;;; PASSWORD
 (defn password-hash
@@ -41,6 +33,16 @@
 (defn clear-session-identity [request]
   (assoc-in request [:session :identity] nil))
 
+(defn register-user [{params :params}]
+  ;;; TODO - add validation
+  (let [email (get params :email)
+        password (get params :password)
+        first-name (get params :first-name)
+        last-name (get params :last-name)
+        hashed (password-hash password)
+        new-params {:email email :pass hashed :first_name first-name :last_name last-name}]
+    (do (db/create-user! new-params))
+        (layout/render "registered.html")))
 
 ;;;
 
@@ -50,14 +52,20 @@
     "home.html"
     {:message request}))
 
-(defn test-page []
+(defn test-page [request]
   (layout/render
     "test.html"))
+
+(defn register-page []
+  (layout/render
+    "register.html"))
 
 (defn about-page []
   (layout/render "about.html"))
 
 (defroutes home-routes
   (GET "/" request (home-page request))
-  (GET "/test" [] (test-page))
+  (GET "/test" request (test-page request))
+  (GET "/register" [] (register-page))
+  (POST "/register" request (register-user request))
   (GET "/about" [] (about-page)))

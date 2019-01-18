@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block content %}
+  <p>Here's a registration form.</p>
+  <form action="/register" method="post">
+    {% csrf-field %}
+    Email:<br>
+    <input type="text" name="email" value="address@example.com"><br>
+    First (Given) Name:<br>
+    <input type="text" name="first-name" value="Ash"><br>
+    Last (Family) Name:<br>
+    <input type="text" name="last-name" value="Ketchum"><br>
+    Password:<br>
+    <input type="password" name="password"><br>
+    <input type="submit" value="Submit">
+  </form>
+{% endblock %}
