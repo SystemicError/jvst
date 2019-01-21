@@ -27,8 +27,8 @@
 
 ;;; USER FUNCTIONALITY
 
-(defn add-user-to-session [request user]
-  (assoc-in request [:session :identity] user)) ; http://www.luminusweb.net/docs/routes.html#restricting_access
+(defn add-user-to-session [request email]
+  (assoc-in request [:session :identity] email)) ; http://www.luminusweb.net/docs/routes.html#restricting_access
 
 (defn clear-session-identity [request]
   (assoc-in request [:session :identity] nil))
@@ -48,7 +48,7 @@
   (let [email (str/lower-case (get params :email))
         password (get params :password)]
     (if (validate-password email password)
-      "That's a valid login!"
+      (home-page (add-user-to-session request email))
       "That's an invalid login!")))
 
 ;;; PAGES
