@@ -22,7 +22,7 @@
   (hashers/derive password {:alg :bcrypt+sha512}))
 
 (defn validate-password [email password]
-  (hashers/check password (get (get-user email) :password)))
+  (hashers/check password (get (get-user email) :pass)))
 
 
 ;;; USER FUNCTIONALITY
@@ -44,7 +44,14 @@
     (do (db/create-user! new-params))
         (layout/render "registered.html")))
 
-;;;
+(defn login-user [{params :params :as request}]
+  (let [email (str/lower-case (get params :email))
+        password (get params :password)]
+    (if (validate-password email password)
+      "That's a valid login!"
+      "That's an invalid login!")))
+
+;;; PAGES
 
 
 (defn home-page [request]
@@ -68,4 +75,6 @@
   (GET "/test" request (test-page request))
   (GET "/register" [] (register-page))
   (POST "/register" request (register-user request))
+  (POST "/login" request (login-user request))
   (GET "/about" [] (about-page)))
+
