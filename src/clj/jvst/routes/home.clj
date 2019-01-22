@@ -25,10 +25,27 @@
   (hashers/check password (get (get-user email) :pass)))
 
 
+;;; PAGES
+
+(defn home-page [request]
+  (layout/render "home.html" request))
+
+(defn test-page [request]
+  (layout/render
+    "test.html"))
+
+(defn register-page []
+  (layout/render
+    "register.html"))
+
+(defn about-page []
+  (layout/render "about.html"))
+
 ;;; USER FUNCTIONALITY
 
 (defn add-user-to-session [request email]
-  (assoc-in request [:session :identity] email)) ; http://www.luminusweb.net/docs/routes.html#restricting_access
+  (assoc-in (assoc-in request [:session :identity] email)
+    [:session :logged-in] true))
 
 (defn clear-session-identity [request]
   (assoc-in request [:session :identity] nil))
@@ -50,25 +67,6 @@
     (if (validate-password email password)
       (home-page (add-user-to-session request email))
       "That's an invalid login!")))
-
-;;; PAGES
-
-
-(defn home-page [request]
-  (layout/render
-    "home.html"
-    {:message request}))
-
-(defn test-page [request]
-  (layout/render
-    "test.html"))
-
-(defn register-page []
-  (layout/render
-    "register.html"))
-
-(defn about-page []
-  (layout/render "about.html"))
 
 (defroutes home-routes
   (GET "/" request (home-page request))

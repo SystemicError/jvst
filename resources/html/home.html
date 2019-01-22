@@ -1,21 +1,25 @@
 {% extends "base.html" %}
 {% block content %}
 <h2>Welcome to the Japanese Vocabulary Size Test</h2>
-<p>Here's some copy about this page.</p>
-<div>
-	<p>Let's put a login form here.  Or, if you're already logged in, we won't show this part.</p>
-	{% include "login.html" %}
-</div>
-<div>
-	<p>If you're logged in AND you haven't finished the test and post-survey, we'll put a link to the test here.</p>
-<div>
-	<p>Let's put a logout button here.  Or, if you're not logged in, we won't show this part.</p>
-</div>
-
+{% if session.identity %}
+  <div>
+    <p>Here's some copy thanking you for logging in.</p>
+    <p>If you haven't finished the test and post-survey, we'll put a link to the test here.</p>
+  </div>
+  <div>
+    <p>Let's put a logout button here.</p>
+  </div>
+{% else %}
+  <div>
+    <p>Here's some copy about this page.</p>
+    <p>Let's put a login form here.</p>
+    {% include "login.html" %}
+  </div>
+{% endif %}
 <div>
 	<p>Here's some test code:</p>
 	<ul>
-	  <p>{% for item in  message %}
+	  <p>{% for item in session %}
 	     <li>{{item}}</li>
 	     {% endfor %}
 	  </p>
