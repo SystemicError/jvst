@@ -44,8 +44,7 @@
 ;;; USER FUNCTIONALITY
 
 (defn add-user-to-session [request email]
-  (assoc-in (assoc-in request [:session :identity] email)
-    [:session :logged-in] true))
+  (assoc-in request [:session :identity] email))
 
 (defn clear-session-identity [request]
   (assoc-in request [:session :identity] nil))
