@@ -55,8 +55,12 @@
         last-name (get params :last-name)
         hashed (password-hash password)
         new-params {:email email :pass hashed :first_name first-name :last_name last-name}]
-    (do (db/create-user! new-params))
-        (layout/render "registered.html")))
+    (layout/render
+      "registered.html"
+      (try
+        {:registered (db/create-user! new-params)}
+        (catch Exception e {:reason e})))))
+
 
 (defn login-user [{params :params :as request}]
   (let [email (str/lower-case (get params :email))
