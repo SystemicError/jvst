@@ -7,23 +7,13 @@
     <p>If you haven't finished the test and post-survey, we'll put a link to the test here.</p>
   </div>
   <div>
-    <p>Let's put a logout button here.</p>
+    <p>You can also <a href="/logout">log out</a>.</p>
   </div>
 {% else %}
   <div>
     <p>Here's some copy about this page.</p>
-    <p>Let's put a login form here.</p>
     {% include "login.html" %}
   </div>
 {% endif %}
-<div>
-	<p>Here's some test code:</p>
-	<ul>
-	  <p>{% for item in session %}
-	     <li>{{item}}</li>
-	     {% endfor %}
-	  </p>
-	</ul>
-</div>
 
 {% endblock %}
