@@ -62,11 +62,11 @@
   (let [email (str/lower-case (get params :email))
         password (get params :password)]
     (if (validate-password email password)
-      (add-user-to-session (home-page request) email)
+      (add-user-to-session (home-page (add-user-to-session request email)) email)
       "That's an invalid login!")))
 
 (defn logout-user [request]
-  (clear-session-identity (home-page request)))
+  (clear-session-identity (home-page (clear-session-identity request))))
 
 (defroutes home-routes
   (GET "/" request (home-page request))
