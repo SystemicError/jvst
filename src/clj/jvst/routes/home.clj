@@ -43,8 +43,8 @@
 
 ;;; USER FUNCTIONALITY
 
-(defn add-user-to-session [request email]
-  (assoc-in request [:session :identity] email))
+(defn add-user-to-session [response email]
+  (assoc-in response [:session :identity] email))
 
 (defn clear-session-identity [request]
   (assoc-in request [:session :identity] nil))
@@ -64,7 +64,7 @@
   (let [email (str/lower-case (get params :email))
         password (get params :password)]
     (if (validate-password email password)
-      (home-page (add-user-to-session request email))
+      (add-user-to-session (home-page request) email)
       "That's an invalid login!")))
 
 (defroutes home-routes
