@@ -31,8 +31,7 @@
   (layout/render "home.html" request))
 
 (defn test-page [request]
-  (layout/render
-    "test.html"))
+  (layout/render "test.html" request))
 
 (defn register-page []
   (layout/render
