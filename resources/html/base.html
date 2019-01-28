@@ -35,17 +35,26 @@
                       test 
                       </a>
                   <li class="nav-item">
-                      <a href="/register"
-                         class="nav-link{% ifequal page "register.html" %} active{%endifequal%}">
-                      register
-                      </a>
-                  </li>
-                  <li class="nav-item">
                       <a href="/about"
                          class="nav-link{% ifequal page "about.html" %} active{%endifequal%}">
                       about
                       </a>
                   </li>
+		  {% if session.identity %}
+                  <li class="nav-item">
+                      <a href="/logout"
+                         class="nav-link{% ifequal page "logout.html" %} active{%endifequal%}">
+                      logout
+                      </a>
+                  </li>
+		  {% else %}
+                  <li class="nav-item">
+                      <a href="/register"
+                         class="nav-link{% ifequal page "register.html" %} active{%endifequal%}">
+                      register
+                      </a>
+                  </li>
+		  {% endif %}
               </ul>
           </div>
       </nav>

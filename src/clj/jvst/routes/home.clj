@@ -33,12 +33,11 @@
 (defn test-page [request]
   (layout/render "test.html" request))
 
-(defn register-page []
-  (layout/render
-    "register.html"))
+(defn register-page [request]
+  (layout/render "register.html" request))
 
-(defn about-page []
-  (layout/render "about.html"))
+(defn about-page [request]
+  (layout/render "about.html" request))
 
 ;;; USER FUNCTIONALITY
 
@@ -69,8 +68,8 @@
 (defroutes home-routes
   (GET "/" request (home-page request))
   (GET "/test" request (test-page request))
-  (GET "/register" [] (register-page))
+  (GET "/register" request (register-page request))
   (POST "/register" request (register-user request))
   (POST "/login" request (login-user request))
-  (GET "/about" [] (about-page)))
+  (GET "/about" request (about-page request)))
 
