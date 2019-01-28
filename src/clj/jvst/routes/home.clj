@@ -65,11 +65,15 @@
       (add-user-to-session (home-page request) email)
       "That's an invalid login!")))
 
+(defn logout-user [request]
+  (clear-session-identity (home-page request)))
+
 (defroutes home-routes
   (GET "/" request (home-page request))
   (GET "/test" request (test-page request))
   (GET "/register" request (register-page request))
   (POST "/register" request (register-user request))
   (POST "/login" request (login-user request))
+  (GET "/logout" request (logout-user request))
   (GET "/about" request (about-page request)))
 
