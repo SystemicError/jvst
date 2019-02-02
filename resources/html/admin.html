@@ -4,11 +4,38 @@
 {% if admin %}
   <div>
     <p>You are using an admin account.  Beware!  Actions taken on this page may affect the user database and test bank.</p>
-    <ul>
-    {% for user in users %}
-      <li><p>{{user}}</p></li>
-    {% endfor %}
-    </ul>
+  </div>
+  <div>
+    <p>User list:</p>
+  </div>
+  <div style="overflow: scroll;width: 80%;height: 200px;">
+    <table>
+      <tr>
+        <th>Email</th>
+        <th>First Name</th>
+        <th>Last Name</th>
+        <th>Active?</th>
+        <th>Admin?</th>
+        <th>Last login</th>
+      </tr>
+      {% for user in users %}
+      <tr>
+        <td><p>{{user.email}}</p></td>
+        <td><p>{{user.first_name}}</p></td>
+        <td><p>{{user.last_name}}</p></td>
+        <td><p>{{user.is_active}}</p></td>
+        <td><p>{{user.admin}}</p></td>
+        <td><p>{{user.last_login}}</p></td>
+      </tr>
+      {% endfor %}
+    </table>
+  </div>
+  <br>
+  <div>
+    <form action="/load_test_bank" method="post">
+      {% csrf-field %}
+      <input type="submit" name="load_test_bank" value="(Re)load Test Bank" />
+    </form>
   </div>
 {% else %}
   <div>

@@ -24,6 +24,10 @@
 (defn validate-password [email password]
   (hashers/check password (get (get-user email) :pass)))
 
+(defn admin? [request]
+  (let [session (request :session)
+        email (if session (session :identity))]
+    (= email "admin")))
 
 ;;; PAGES
 
@@ -40,18 +44,38 @@
   (layout/render "about.html" request))
 
 (defn admin-page [request]
-  (let [session (request :session)
-        email (if session (session :identity))
-        admin? (= email "admin")
-        dummy (println (db/get-users))]
-    (if admin?
-      (layout/render
-        "admin.html"
-        (into request
-              {:admin admin?
-               :users (db/get-users)}))
-      (layout/render "admin.html")))
+  (if (admin? request)
+    (layout/render
+      "admin.html"
+      (into request
+            {:admin admin?
+             :users (for [user (db/get-users)] (dissoc user :pass))}))
+    (layout/render "admin.html"))
   )
+
+;;; QUESTION BANK FUNCTIONALITY
+
+(defn add-questions [qs]
+  (println qs)
+  )
+
+(defn parse-test-bank-tsv
+  "Converts tsv file into edn format."
+  [path]
+  (let [text (slurp path)
+        lines (str/split-lines text)
+        cells (for [line lines] (str/split line #"\t"))
+        labels (list :id :set :headword :furigana :example :correct :option-1 :option-2 :option-3 :option-4)
+        questions (for [cell cells] (apply assoc {} (interleave labels cell)))]
+    (add-questions questions))
+  )
+
+(defn load-test-bank [request]
+  (if (admin? request)
+    (do
+      (parse-test-bank-tsv "vocab_questions.tsv")
+      (admin-page request))))
+
 
 ;;; USER FUNCTIONALITY
 
@@ -94,5 +118,6 @@
   (POST "/login" request (login-user request))
   (GET "/logout" request (logout-user request))
   (GET "/about" request (about-page request))
-  (GET "/admin" request (admin-page request)))
+  (GET "/admin" request (admin-page request))
+  (POST "/load_test_bank" request (load-test-bank request)))
 
