@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Administration</h2>
+{% if admin %}
+  <div>
+    <p>You are using an admin account.  Beware!  Actions taken on this page may affect the user database and test bank.</p>
+    <ul>
+    {% for user in users %}
+      <li><p>{{user}}</p></li>
+    {% endfor %}
+    </ul>
+  </div>
+{% else %}
+  <div>
+    <p>You are not authorized to view this page.</p>
+  </div>
+{% endif %}
+
+{% endblock %}

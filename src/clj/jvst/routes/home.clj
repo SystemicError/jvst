@@ -39,6 +39,20 @@
 (defn about-page [request]
   (layout/render "about.html" request))
 
+(defn admin-page [request]
+  (let [session (request :session)
+        email (if session (session :identity))
+        admin? (= email "admin")
+        dummy (println (db/get-users))]
+    (if admin?
+      (layout/render
+        "admin.html"
+        (into request
+              {:admin admin?
+               :users (db/get-users)}))
+      (layout/render "admin.html")))
+  )
+
 ;;; USER FUNCTIONALITY
 
 (defn add-user-to-session [response email]
@@ -79,5 +93,6 @@
   (POST "/register" request (register-user request))
   (POST "/login" request (login-user request))
   (GET "/logout" request (logout-user request))
-  (GET "/about" request (about-page request)))
+  (GET "/about" request (about-page request))
+  (GET "/admin" request (admin-page request)))
 

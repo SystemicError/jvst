@@ -39,6 +39,10 @@ WHERE email = :email
 SELECT * FROM users
 WHERE email = :email
 
+-- :name get-users :? :*
+-- :doc gets a list of all users
+SELECT * FROM users
+
 -- :name delete-user! :! :n
 -- :doc deletes a user record given email
 DELETE FROM users
