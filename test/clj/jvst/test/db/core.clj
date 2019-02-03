@@ -74,3 +74,22 @@
                t-conn
                {:email "sam.smith@example.com"})))
     ))
+
+
+;; VOCAB QUESTIONS
+(deftest test-vocab-questions
+  (jdbc/with-db-transaction [t-conn *db*]
+    (jdbc/db-set-rollback-only! t-conn)
+    (is (= 1 (db/create-vocab-question!
+               t-conn
+               {:id 1
+                :set 1
+                :headword "Headword!"
+                :furigana "Furigana!"
+                :example "Example!"
+                :correct "Right answer!"
+                :option_1 "Wrong answer 1!"
+                :option_2 "Right answer!"
+                :option_3 "Wrong answer 2!"
+                :option_4 "Wrong answer 3!"})))
+    ))

@@ -55,7 +55,7 @@
 
 ;;; QUESTION BANK FUNCTIONALITY
 
-(defn add-questions [qs]
+(defn add-vocab-questions [qs]
   (println qs)
   )
 
@@ -67,7 +67,7 @@
         cells (for [line lines] (str/split line #"\t"))
         labels (list :id :set :headword :furigana :example :correct :option-1 :option-2 :option-3 :option-4)
         questions (for [cell cells] (apply assoc {} (interleave labels cell)))]
-    (add-questions questions))
+    (add-vocab-questions questions))
   )
 
 (defn load-test-bank [request]
