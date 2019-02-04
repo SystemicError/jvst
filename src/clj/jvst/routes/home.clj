@@ -65,7 +65,6 @@
              (catch Exception e
                ; if this question is already in the database
                (do
-                 (println e)
                  (db/delete-vocab-question! {:id (:id q)}))
                  (db/create-vocab-question! q)))
         (recur (rest qs)))))
