@@ -8,7 +8,7 @@
   <div>
     <p>User list:</p>
   </div>
-  <div style="overflow: scroll;width: 80%;height: 200px;">
+  <div style="overflow: scroll;width: 90%;height: 200px;">
     <table>
       <tr>
         <th>Email</th>
@@ -34,7 +34,7 @@
   <div>
     <p>Vocab question test bank:</p>
   </div>
-  <div style="overflow: scroll;width: 80%;height: 200px;">
+  <div style="overflow: scroll;width: 90%;height: 200px;">
     <table>
       <tr>
         <th>ID</th>
@@ -52,9 +52,9 @@
       <tr>
         <td><p>{{vq.id}}</p></td>
         <td><p>{{vq.set}}</p></td>
-        <td><p>{{vq.headword}}</p></td>
-        <td><p>{{vq.furigana}}</p></td>
-        <td><p>{{vq.example}}</p></td>
+        <td><p>{{vq.headword|safe}}</p></td>
+        <td><p>{{vq.furigana|safe}}</p></td>
+        <td><p>{{vq.example|safe}}</p></td>
         <td><p>{{vq.correct}}</p></td>
         <td><p>{{vq.option_1}}</p></td>
         <td><p>{{vq.option_2}}</p></td>
