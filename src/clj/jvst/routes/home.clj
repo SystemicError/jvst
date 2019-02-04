@@ -49,19 +49,26 @@
       "admin.html"
       (into request
             {:admin admin?
-             :users (for [user (db/get-users)] (dissoc user :pass))}))
+             :users (for [user (db/get-users)] (dissoc user :pass))
+             :vqs (db/get-vocab-questions)}))
     (layout/render "admin.html"))
   )
 
 ;;; QUESTION BANK FUNCTIONALITY
 
 (defn add-vocab-questions [qs]
-  (for [q qs]
-    (do
-      (if (db/get-vocab-question (:id q))
-        ; if this question is already in the database
-        (db/delete-vocab-question! {:id (:id q)}))
-      (db/create-vocab-question! q)))
+  (if (empty? qs)
+    0
+    (let [q (first qs)]
+      (do
+        (try (db/create-vocab-question! q)
+             (catch Exception e
+               ; if this question is already in the database
+               (do
+                 (println e)
+                 (db/delete-vocab-question! {:id (:id q)}))
+                 (db/create-vocab-question! q)))
+        (recur (rest qs)))))
   )
 
 (defn parse-test-bank-tsv
@@ -70,7 +77,7 @@
   (let [text (slurp path)
         lines (str/split-lines text)
         cells (for [line lines] (str/split line #"\t"))
-        labels (list :id :set :headword :furigana :example :correct :option-1 :option-2 :option-3 :option-4)
+        labels (list :id :set :headword :furigana :example :correct :option_1 :option_2 :option_3 :option_4)
         questions (for [cell cells] (apply assoc {} (interleave labels cell)))]
     (add-vocab-questions questions))
   )
