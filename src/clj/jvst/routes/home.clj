@@ -56,7 +56,12 @@
 ;;; QUESTION BANK FUNCTIONALITY
 
 (defn add-vocab-questions [qs]
-  (println qs)
+  (for [q qs]
+    (do
+      (if (db/get-vocab-question (:id q))
+        ; if this question is already in the database
+        (db/delete-vocab-question! {:id (:id q)}))
+      (db/create-vocab-question! q)))
   )
 
 (defn parse-test-bank-tsv
