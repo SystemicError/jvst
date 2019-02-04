@@ -35,7 +35,17 @@
   (layout/render "home.html" request))
 
 (defn test-page [request]
-  (layout/render "test.html" request))
+  (let [session (request :session)
+        email (if session (session :identity))
+        user (if email (get-user email))
+        queue (if user (user :question_set_queue))
+        finished (= queue :finished)
+        pretest (= queue nil)
+        dummy (println user)]
+    (layout/render "test.html" (into request
+                                     (into queue
+                                           {:finished finished
+                                            :pretest pretest})))))
 
 (defn register-page [request]
   (layout/render "register.html" request))

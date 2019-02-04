@@ -2,12 +2,22 @@
 {% block content %}
 <h2>Japanese Vocabulary Size Test</h2>
 {% if session.identity %}
+  {% if pretest %}
   <div>
-    <p>If you've finished the test and post-survey, we'll put a logout link here.</p>
+    <p>You have not yet begun the test.  Here's an example question to get you used to the format.</p>
   </div>
-  <div>
-    <p>If you haven't completed the test and post-survey, we'll put your next set of questions here.</p>
-  </div>
+  {% else %}
+    {% if finished %}
+      <div>
+        <p>You have completed the test.  Here's a post-survey.</p>
+      </div>
+    {% else %}
+      <div>
+	<p>You are still taking the test.  Here's your next set of questions.</p>
+	<p>{{queue}}</p>
+      </div>
+    {% endif %}
+  {% endif %}
 {% else %}
   <div>
     <p>Please log in before continuing:</p>
