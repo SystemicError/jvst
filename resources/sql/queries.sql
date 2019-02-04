@@ -61,6 +61,7 @@ VALUES (:id, :set, :headword, :furigana, :example, :correct, :option_1, :option_
 SELECT * FROM vocab_questions
 WHERE id = :id
 
--- :name delete-vocab-questions! :! :n
--- :doc deletes all vocab questions
-DELETE * FROM vocab_questions
+-- :name delete-vocab-question! :! :n
+-- :doc deletes a single vocab question
+DELETE FROM vocab_questions
+WHERE id = :id
