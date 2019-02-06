@@ -2,19 +2,43 @@
 {% block content %}
 <h2>Japanese Vocabulary Size Test</h2>
 {% if session.identity %}
-  {% if pretest %}
-  <div>
-    <p>You have not yet begun the test.  Here's an example question to get you used to the format.</p>
-  </div>
+  {% if questions %}
+    <div>
+      <p>Here is your next set of questions.</p>
+      <form method="post" action="/test">
+      {% csrf-field %}
+      {% for question in questions %}
+        <p>Headword:  {{question.headword|safe}}</p>
+	<p>Furigana:  {{question.furigana|safe}}</p>
+	<p>Example:  {{question.example|safe}}</p>
+	<p>
+	<input type="radio" name="response{{ forloop.counter0 }}" value="1">
+	{{question.option_1|safe}}<br>
+	<input type="radio" name="response{{ forloop.counter0 }}" value="2">
+	{{question.option_2|safe}}<br>
+	<input type="radio" name="response{{ forloop.counter0 }}" value="3">
+	{{question.option_3|safe}}<br>
+	<input type="radio" name="response{{ forloop.counter0 }}" value="4">
+	{{question.option_4|safe}}<br>
+	<input type="radio" name="response{{ forloop.counter0 }}" value="0" checked>
+	I don't know</p>
+      {% endfor %}
+        <input type="submit" name="submit" value="Submit" />
+      </form>
+    </div>
   {% else %}
     {% if finished %}
       <div>
-        <p>You have completed the test.  Here's a post-survey.</p>
+	<p>You have finished the test, here's a link to the post-survey.</p>
       </div>
     {% else %}
       <div>
-	<p>You are still taking the test.  Here's your next set of questions.</p>
-	<p>{{queue}}</p>
+        <p>Since no questions were sent from the backend but you're not finished with the test, here's some copy about starting/resuming the test.</p>
+	<br>
+	<form action="/test" method="post">
+          {% csrf-field %}
+          <input type="submit" name="begin" value="Begin Test" />
+	</form>
       </div>
     {% endif %}
   {% endif %}
