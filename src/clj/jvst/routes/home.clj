@@ -6,15 +6,33 @@
             [clojure.java.io :as io]
             [buddy.hashers :as hashers]
             [clojure.tools.logging :as log]
-            [clojure.string :as str]))
+            [clojure.string :as str]
+            [clojure.edn :as edn]))
 
 
-;;; adapted code
 
-;;; "DATABASE"
+;;; DATABASE
 
 (defn get-user [email]
   (db/get-user {:email email}))
+
+;;; VOCAB TEST
+
+(defn generate-test []
+  "Creates a question set queue for a new test."
+  (str (vector 1 2 3 4)))
+
+(defn queue-to-questions [queue-str]
+  "returns a collection of the vocab questions in the first question set in queue"
+  (let [queue (for [q (edn/read-string queue-str)] (db/get-vocab-question {:id q}))
+        n (:set (first queue))
+        dummy (println (str "n = " n))]
+    (filter #(= (:set %) n) queue)))
+
+(defn count-question-sets [queue-str]
+  "Counts the number of question sets in a given queue."
+  (let [qsets (map #(:set %) (queue-to-questions queue-str))]
+    (count (clojure.core/set qsets))))
 
 ;;; PASSWORD
 (defn password-hash
@@ -34,18 +52,55 @@
 (defn home-page [request]
   (layout/render "home.html" request))
 
+
 (defn test-page [request]
+  (layout/render "test.html" request))
+
+(defn process-test-responses [request]
+  ; queue      responses          display           to-template  updated-queue
+  ;
+  ; nil        nil                example page      nil          (assign test)
+  ; [vector]   nil or incomplete  question set      questions    unmodified
+  ; [vector]   answer form        next question set questions    advance one set
+  ; last page  nil or incomplete  question set      questions    unmodified
+  ; last page  answer form        post-survey link  finished     "finished"
+  ; "finished" *                  post-survey link  finished     "finished"
   (let [session (request :session)
         email (if session (session :identity))
         user (if email (get-user email))
         queue (if user (user :question_set_queue))
-        finished (= queue :finished)
-        pretest (= queue nil)
-        dummy (println user)]
-    (layout/render "test.html" (into request
-                                     (into queue
-                                           {:finished finished
-                                            :pretest pretest})))))
+        responses (request :responses)
+        qset-count (count-question-sets queue)
+        dummy (println (str "Queue:" queue "\nresponse:" responses))
+        updated-queue (if queue
+                        (if (= "finished" queue)
+                          ; finished
+                          "finished"
+                          (if (= 1 qset-count)
+                            ; last page
+                            queue ; TODO check if responses complete
+                            ;"finished"
+                            ; [vector]
+                            ;TODO advance queue
+                            queue))
+                        ; nil
+                        (generate-test))
+        to-template (if queue
+                      (if (= "finished" queue)
+                        ; finished
+                        {:finished true}
+                        (if (= 1 qset-count)
+                          ; last page
+                          {:questions (into [] (queue-to-questions queue))} ; TODO check if responses complete
+                          ;{:finished true}
+                          ; [vector]
+                          ;TODO advance queue
+                          {:questions "question list"}))
+                      ; nil
+                      {})]
+    (do
+      (db/update-question-set-queue! {:email email :question_set_queue updated-queue})
+      (test-page (into request to-template)))))
 
 (defn register-page [request]
   (layout/render "register.html" request))
@@ -134,6 +189,7 @@
 (defroutes home-routes
   (GET "/" request (home-page request))
   (GET "/test" request (test-page request))
+  (POST "/test" request (process-test-responses request))
   (GET "/register" request (register-page request))
   (POST "/register" request (register-user request))
   (POST "/login" request (login-user request))
