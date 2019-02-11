@@ -53,49 +53,47 @@
 (defn process-test-responses [request]
   ; queue      responses          display           to-template  updated-queue     results
   ;
-  ; nil        nil                example page      nil          (assign test)     nil
-  ; [vector]   nil or incomplete  question set      questions    unmodified        unmodified
-  ; [vector]   answer form        next question set questions    advance one set   push results
-  ; last page  nil or incomplete  question set      questions    unmodified        unmodified
-  ; last page  answer form        post-survey link  finished     ":finished"       push results
-  ; "finished" *                  post-survey link  finished     ":finished"       unmodified
+  ; nil        nil                example page      nil          (generate-test)   []
+  ; [vector]   answer form        next question set questions    advance one set   push responses
+  ; last page  answer form        post-survey link  finished     :finished         push responses
+  ; :finished  *                  post-survey link  finished     :finished         unmodified
 
-  ; Actually, we might not need to check if results are incomplete, since the default answer is set as "I don't know"
+  ; We don't check if results are incomplete, since the default answer is set as "I don't know"
   ; and the csrf field has our back on forged submissions.
+  ; However, we do check if responses are absent, in case someone leaves the test page and comes back at a later time, or if they've only just begun.
   (let [session (request :session)
         email (if session (session :identity))
         user (if email (get-user email))
         queue (if user (edn/read-string (user :question_set_queue)))
-        responses (request :responses)
+        responses (request :params)
         qset-count (count queue)
+        ;dummy (println (str "request" request))
         dummy (println (str "Queue:" queue "\nresponse:" responses))
-        updated-queue (if queue
-                        (if (= :finished queue)
-                          ; finished
-                          :finished
-                          (if (= 1 qset-count)
-                            ; last page
-                            :finished 
-                            ; [vector] ; not the last page
-                            (rest queue)
-                            ))
-                        ; nil
-                        (generate-test))
-        to-template (if queue
-                      (if (= :finished queue)
-                        ; finished
-                        {:finished true}
-                        (if (= 1 qset-count)
-                          ; last page
-                          {:finished true}
-                          ; [vector]
-                          {:questions (into [] (queue-to-questions (rest queue)))}))
-                      ; nil
-                      {})]
+        updates (if queue
+                  (if (= :finished queue)
+                    ; finished
+                    {:queue :finished
+                     :to-template {:finished true}}
+                    (if (= 1 qset-count)
+                      ; last page
+                      (if responses
+                        {:queue :finished
+                         :to-template {:finished true}}
+                        {:queue queue
+                         :to-template {:questions (into [] (queue-to-questions queue))}})
+                      ; [vector]
+                      (if responses
+                        {:queue (rest queue)
+                         :to-template {:questions (into [] (queue-to-questions (rest queue)))}}
+                        {:queue queue
+                         :to-template {:questions (into [] (queue-to-questions queue))}})))
+                  ; nil
+                  {:queue (generate-test)
+                   :to-template {}})]
     (do
       (db/update-question-set-queue! {:email email
-                                      :question_set_queue (str updated-queue)})
-      (test-page (into request to-template)))))
+                                      :question_set_queue (str (updates :queue))})
+      (test-page (into request (updates :to-template))))))
 
 (defn register-page [request]
   (layout/render "register.html" request))
