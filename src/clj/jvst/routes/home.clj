@@ -51,14 +51,17 @@
   (layout/render "test.html" request))
 
 (defn process-test-responses [request]
-  ; queue      responses          display           to-template  updated-queue
+  ; queue      responses          display           to-template  updated-queue     results
   ;
-  ; nil        nil                example page      nil          (assign test)
-  ; [vector]   nil or incomplete  question set      questions    unmodified
-  ; [vector]   answer form        next question set questions    advance one set
-  ; last page  nil or incomplete  question set      questions    unmodified
-  ; last page  answer form        post-survey link  finished     ":finished"
-  ; "finished" *                  post-survey link  finished     ":finished"
+  ; nil        nil                example page      nil          (assign test)     nil
+  ; [vector]   nil or incomplete  question set      questions    unmodified        unmodified
+  ; [vector]   answer form        next question set questions    advance one set   push results
+  ; last page  nil or incomplete  question set      questions    unmodified        unmodified
+  ; last page  answer form        post-survey link  finished     ":finished"       push results
+  ; "finished" *                  post-survey link  finished     ":finished"       unmodified
+
+  ; Actually, we might not need to check if results are incomplete, since the default answer is set as "I don't know"
+  ; and the csrf field has our back on forged submissions.
   (let [session (request :session)
         email (if session (session :identity))
         user (if email (get-user email))
@@ -72,9 +75,9 @@
                           :finished
                           (if (= 1 qset-count)
                             ; last page
-                            queue ; TODO check if responses complete.  If we are, return :finished, else the unmodified queue
+                            :finished 
                             ; [vector] ; not the last page
-                            queue ;TODO check if responsese complete.  If so, advance queue, else the unmodified queue.
+                            (rest queue)
                             ))
                         ; nil
                         (generate-test))
@@ -84,9 +87,9 @@
                         {:finished true}
                         (if (= 1 qset-count)
                           ; last page
-                          {:questions (into [] (queue-to-questions queue))} ; TODO check if responses complete.  If so, return {:finished true}, else the questions again.
+                          {:finished true}
                           ; [vector]
-                          {:questions (into [] (queue-to-questions queue))})) ;TODO check if responses complete.  If so, advance queue and return new questions, else return current page of questions again.
+                          {:questions (into [] (queue-to-questions (rest queue)))}))
                       ; nil
                       {})]
     (do
