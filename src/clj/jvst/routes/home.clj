@@ -20,19 +20,13 @@
 
 (defn generate-test []
   "Creates a question set queue for a new test."
-  (str (vector 1 2 3 4)))
+  ;TODO
+  [(range 10) (map #(+ 10 %) (range 10))])
 
-(defn queue-to-questions [queue-str]
+(defn queue-to-questions [queue]
   "returns a collection of the vocab questions in the first question set in queue"
-  (let [queue (for [q (edn/read-string queue-str)] (db/get-vocab-question {:id q}))
-        n (:set (first queue))
-        dummy (println (str "n = " n))]
-    (filter #(= (:set %) n) queue)))
-
-(defn count-question-sets [queue-str]
-  "Counts the number of question sets in a given queue."
-  (let [qsets (map #(:set %) (queue-to-questions queue-str))]
-    (count (clojure.core/set qsets))))
+  (for [q (first queue)]
+       (db/get-vocab-question {:id q})))
 
 ;;; PASSWORD
 (defn password-hash
@@ -63,43 +57,41 @@
   ; [vector]   nil or incomplete  question set      questions    unmodified
   ; [vector]   answer form        next question set questions    advance one set
   ; last page  nil or incomplete  question set      questions    unmodified
-  ; last page  answer form        post-survey link  finished     "finished"
-  ; "finished" *                  post-survey link  finished     "finished"
+  ; last page  answer form        post-survey link  finished     ":finished"
+  ; "finished" *                  post-survey link  finished     ":finished"
   (let [session (request :session)
         email (if session (session :identity))
         user (if email (get-user email))
-        queue (if user (user :question_set_queue))
+        queue (if user (edn/read-string (user :question_set_queue)))
         responses (request :responses)
-        qset-count (count-question-sets queue)
+        qset-count (count queue)
         dummy (println (str "Queue:" queue "\nresponse:" responses))
         updated-queue (if queue
-                        (if (= "finished" queue)
+                        (if (= :finished queue)
                           ; finished
-                          "finished"
+                          :finished
                           (if (= 1 qset-count)
                             ; last page
-                            queue ; TODO check if responses complete
-                            ;"finished"
-                            ; [vector]
-                            ;TODO advance queue
-                            queue))
+                            queue ; TODO check if responses complete.  If we are, return :finished, else the unmodified queue
+                            ; [vector] ; not the last page
+                            queue ;TODO check if responsese complete.  If so, advance queue, else the unmodified queue.
+                            ))
                         ; nil
                         (generate-test))
         to-template (if queue
-                      (if (= "finished" queue)
+                      (if (= :finished queue)
                         ; finished
                         {:finished true}
                         (if (= 1 qset-count)
                           ; last page
-                          {:questions (into [] (queue-to-questions queue))} ; TODO check if responses complete
-                          ;{:finished true}
+                          {:questions (into [] (queue-to-questions queue))} ; TODO check if responses complete.  If so, return {:finished true}, else the questions again.
                           ; [vector]
-                          ;TODO advance queue
-                          {:questions "question list"}))
+                          {:questions (into [] (queue-to-questions queue))})) ;TODO check if responses complete.  If so, advance queue and return new questions, else return current page of questions again.
                       ; nil
                       {})]
     (do
-      (db/update-question-set-queue! {:email email :question_set_queue updated-queue})
+      (db/update-question-set-queue! {:email email
+                                      :question_set_queue (str updated-queue)})
       (test-page (into request to-template)))))
 
 (defn register-page [request]
