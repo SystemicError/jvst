@@ -28,6 +28,15 @@
   (for [q (first queue)]
        (db/get-vocab-question {:id q})))
 
+(defn grade-responses [questions responses]
+  "Returns a hashmap of grades/responses for a question set, with timestamp."
+  (let [timestamp (.toString (java.util.Date.))
+        ids (for [q questions] (:id q))
+        corrects (for [q questions] (:correct q))]
+        ;TODO
+        ; We can do an array of responses and case them?
+        (apply hash-map (interleave ids (for [i ids] timestamp)))))
+
 ;;; PASSWORD
 (defn password-hash
   [password]
@@ -65,8 +74,9 @@
         email (if session (session :identity))
         user (if email (get-user email))
         queue (if user (edn/read-string (user :question_set_queue)))
+        results (if user (edn/read-string (user :vocab_results)) {})
         responses (request :params)
-        qset-count (count queue)
+        generated-test (generate-test)
         ;dummy (println (str "request" request))
         dummy (println (str "Queue:" queue "\nresponse:" responses))
         updates (if queue
@@ -74,25 +84,30 @@
                     ; finished
                     {:queue :finished
                      :to-template {:finished true}}
-                    (if (= 1 qset-count)
+                    (if (= 1 (count queue))
                       ; last page
                       (if responses
                         {:queue :finished
-                         :to-template {:finished true}}
+                         :to-template {:finished true}
+                         :results (grade-responses (queue-to-questions queue) responses)}
                         {:queue queue
                          :to-template {:questions (into [] (queue-to-questions queue))}})
                       ; [vector]
                       (if responses
                         {:queue (rest queue)
-                         :to-template {:questions (into [] (queue-to-questions (rest queue)))}}
+                         :to-template {:questions (into [] (queue-to-questions (rest queue)))}
+                         :results (grade-responses (queue-to-questions queue) responses)}
                         {:queue queue
                          :to-template {:questions (into [] (queue-to-questions queue))}})))
                   ; nil
-                  {:queue (generate-test)
-                   :to-template {}})]
+                  {:queue generated-test
+                   :to-template {:questions (into [] (queue-to-questions generated-test))}})]
     (do
       (db/update-question-set-queue! {:email email
                                       :question_set_queue (str (updates :queue))})
+      (if (updates :results)
+        (db/update-vocab-results! {:email email
+                                   :vocab_results (str (into results (updates :results)))}))
       (test-page (into request (updates :to-template))))))
 
 (defn register-page [request]
