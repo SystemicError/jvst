@@ -7,5 +7,5 @@ CREATE TABLE users
  is_active BOOLEAN,
  pass VARCHAR(300),
  question_set_queue NVARCHAR(MAX),
- vocab_queries NVARCHAR(MAX),
+ vocab_results NVARCHAR(MAX),
  survey_results NVARCHAR(MAX));

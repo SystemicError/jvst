@@ -22,10 +22,10 @@ UPDATE users
 SET question_set_queue = :question_set_queue
 WHERE email = :email
 
--- :name update-vocab-queries! :! :n
--- :doc update vocab query counts
+-- :name update-vocab-results! :! :n
+-- :doc update vocab results
 UPDATE users
-SET vocab_queries = :vocab_queries
+SET vocab_results = :vocab_results
 WHERE email = :email
 
 -- :name update-survey-results! :! :n
