@@ -66,6 +66,11 @@
                   :grade (= response correct)}))))))
 
 
+(defn estimate-vocabulary [user]
+  "Returns the users estimated vocabulary size.  Assumes ten responses per vocab frequency band."
+  ; number correct out of 100 multiplied by 100 = vocab size
+  (* 100 (count (filter true? (vals (user :vocab_results))))))
+
 ;;; PASSWORD
 (defn password-hash
   [password]
