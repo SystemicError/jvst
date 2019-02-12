@@ -53,8 +53,8 @@ WHERE email = :email
 -- :name create-vocab-question! :! :n
 -- :doc creates a new vocab question
 INSERT INTO vocab_questions
-(id, set, headword, furigana, example, correct, option_1, option_2, option_3, option_4)
-VALUES (:id, :set, :headword, :furigana, :example, :correct, :option_1, :option_2, :option_3, :option_4)
+(id, set, headword, furigana, example, option_1, option_2, option_3, option_4)
+VALUES (:id, :set, :headword, :furigana, :example, :option_1, :option_2, :option_3, :option_4)
 
 -- :name get-vocab-question :? :1
 -- :doc retrieves a vocab question given an id
