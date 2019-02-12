@@ -7,7 +7,8 @@
             [buddy.hashers :as hashers]
             [clojure.tools.logging :as log]
             [clojure.string :as str]
-            [clojure.edn :as edn]))
+            [clojure.edn :as edn]
+            [clojure.core :as core]))
 
 
 
@@ -21,7 +22,11 @@
 (defn generate-test []
   "Creates a question set queue for a new test."
   ;TODO
-  (apply vector (for [i (range 10)] (map #(+ (* i 10) %) (range 10)))))
+  (let [qs (db/get-vocab-questions)
+        bands (sort (core/set (map #(:set %) qs)))
+        ids-by-band (for [band bands] (map #(:id %) (filter #(= (:set %) band) qs)))]
+    (into []
+          (for [ids ids-by-band] (take 10 ids)))))
 
 (defn queue-to-questions [queue]
   "returns a collection of the vocab questions in the first question set in queue"
@@ -46,7 +51,6 @@
                  (edn/read-string (responses :response8))
                  (edn/read-string (responses :response9))]
         dummy (println (str "Replies" replies))]
-        ;TODO
         (apply hash-map
            (interleave
              ids
