@@ -37,7 +37,6 @@
   ; each entry of form :id {:timestamp timestamp :response response}
   (let [timestamp (.toString (java.util.Date.))
         ids (for [q questions] (:id q))
-        corrects (for [q questions] (:correct q))
         dummy (println (str responses))
         replies [(edn/read-string (responses :response0))
                  (edn/read-string (responses :response1))
@@ -54,13 +53,17 @@
            (interleave
              ids
              (for [i (range (count ids))]
-               {:timestamp timestamp
-                :response (case (nth replies i)
-                            1 ((nth questions i) :option_1)
-                            2 ((nth questions i) :option_2)
-                            3 ((nth questions i) :option_3)
-                            4 ((nth questions i) :option_4)
-                            "I don't know")})))))
+               (let [question (nth questions i)
+                     correct (question :correct)
+                     response (case (nth replies i)
+                                1 (question :option_1)
+                                2 (question :option_2)
+                                3 (question :option_3)
+                                4 (question :option_4)
+                                "I don't know")]
+                 {:timestamp timestamp
+                  :response response
+                  :grade (= response correct)}))))))
 
 
 ;;; PASSWORD
