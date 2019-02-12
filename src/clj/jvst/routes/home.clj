@@ -54,7 +54,7 @@
              ids
              (for [i (range (count ids))]
                (let [question (nth questions i)
-                     correct (question :correct)
+                     correct (question :option_1)
                      response (case (nth replies i)
                                 1 (question :option_1)
                                 2 (question :option_2)
@@ -183,7 +183,7 @@
   (let [text (slurp path)
         lines (str/split-lines text)
         cells (for [line lines] (str/split line #"\t"))
-        labels (list :id :set :headword :furigana :example :correct :option_1 :option_2 :option_3 :option_4)
+        labels (list :id :set :headword :furigana :example :option_1 :option_2 :option_3 :option_4)
         questions (for [cell cells] (apply assoc {} (interleave labels cell)))]
     (add-vocab-questions questions))
   )
