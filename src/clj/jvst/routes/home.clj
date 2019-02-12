@@ -21,21 +21,44 @@
 (defn generate-test []
   "Creates a question set queue for a new test."
   ;TODO
-  [(range 10) (map #(+ 10 %) (range 10))])
+  (apply vector (for [i (range 10)] (map #(+ (* i 10) %) (range 10)))))
 
 (defn queue-to-questions [queue]
   "returns a collection of the vocab questions in the first question set in queue"
   (for [q (first queue)]
        (db/get-vocab-question {:id q})))
 
-(defn grade-responses [questions responses]
+(defn record-responses [questions responses]
   "Returns a hashmap of grades/responses for a question set, with timestamp."
+  ; each entry of form :id {:timestamp timestamp :response response}
   (let [timestamp (.toString (java.util.Date.))
         ids (for [q questions] (:id q))
-        corrects (for [q questions] (:correct q))]
+        corrects (for [q questions] (:correct q))
+        dummy (println (str responses))
+        replies [(edn/read-string (responses :response0))
+                 (edn/read-string (responses :response1))
+                 (edn/read-string (responses :response2))
+                 (edn/read-string (responses :response3))
+                 (edn/read-string (responses :response4))
+                 (edn/read-string (responses :response5))
+                 (edn/read-string (responses :response6))
+                 (edn/read-string (responses :response7))
+                 (edn/read-string (responses :response8))
+                 (edn/read-string (responses :response9))]
+        dummy (println (str "Replies" replies))]
         ;TODO
-        ; We can do an array of responses and case them?
-        (apply hash-map (interleave ids (for [i ids] timestamp)))))
+        (apply hash-map
+           (interleave
+             ids
+             (for [i (range (count ids))]
+               {:timestamp timestamp
+                :response (case (nth replies i)
+                            1 ((nth questions i) :option_1)
+                            2 ((nth questions i) :option_2)
+                            3 ((nth questions i) :option_3)
+                            4 ((nth questions i) :option_4)
+                            "I don't know")})))))
+
 
 ;;; PASSWORD
 (defn password-hash
@@ -89,14 +112,14 @@
                       (if responses
                         {:queue :finished
                          :to-template {:finished true}
-                         :results (grade-responses (queue-to-questions queue) responses)}
+                         :results (record-responses (queue-to-questions queue) responses)}
                         {:queue queue
                          :to-template {:questions (into [] (queue-to-questions queue))}})
                       ; [vector]
                       (if responses
                         {:queue (rest queue)
                          :to-template {:questions (into [] (queue-to-questions (rest queue)))}
-                         :results (grade-responses (queue-to-questions queue) responses)}
+                         :results (record-responses (queue-to-questions queue) responses)}
                         {:queue queue
                          :to-template {:questions (into [] (queue-to-questions queue))}})))
                   ; nil
