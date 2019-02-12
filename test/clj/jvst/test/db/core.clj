@@ -32,7 +32,7 @@
             :last_login nil
             :is_active  nil
             :question_set_queue nil
-            :vocab_queries nil
+            :vocab_results nil
             :survey_results nil}
            (db/get-user t-conn {:email "sam.smith@example.com"})))
     (is (= 1 (db/update-user!
@@ -48,10 +48,10 @@
                t-conn
                {:email   "sam.smith@example.com"
                 :question_set_queue "test results"})))
-    (is (= 1 (db/update-vocab-queries!
+    (is (= 1 (db/update-vocab-results!
                t-conn
                {:email   "sam.smith@example.com"
-                :vocab_queries "vocab queries"})))
+                :vocab_results "vocab results"})))
     (is (= 1 (db/update-survey-results!
                t-conn
                {:email "sam.smith@example.com"
@@ -64,7 +64,7 @@
             :last_login nil
             :is_active  nil
             :question_set_queue "test results"
-            :vocab_queries "vocab queries"
+            :vocab_results "vocab results"
             :survey_results "survey results"}
            (db/get-user t-conn {:email "sam.smith@example.com"})))
     (is (= 1 (db/delete-user!
@@ -87,11 +87,10 @@
                 :headword "Headword!"
                 :furigana "Furigana!"
                 :example "Example!"
-                :correct "Right answer!"
-                :option_1 "Wrong answer 1!"
-                :option_2 "Right answer!"
-                :option_3 "Wrong answer 2!"
-                :option_4 "Wrong answer 3!"})))
+                :option_1 "Right answer!"
+                :option_2 "Wrong answer!"
+                :option_3 "Wrong answer!"
+                :option_4 "Wrong answer!"})))
     (is (= 1 (db/create-vocab-question!
                t-conn
                {:id 2
@@ -99,21 +98,19 @@
                 :headword "Headword 2!"
                 :furigana "Furigana 2!"
                 :example "Example 2!"
-                :correct "Right answer!"
-                :option_1 "Wrong answer 1!"
-                :option_2 "Right answer!"
-                :option_3 "Wrong answer 2!"
-                :option_4 "Wrong answer 3!"})))
+                :option_1 "Right answer!"
+                :option_2 "Wrong answer!"
+                :option_3 "Wrong answer!"
+                :option_4 "Wrong answer!"})))
     (is (= {:id 1
             :set 1
             :headword "Headword!"
             :furigana "Furigana!"
             :example "Example!"
-            :correct "Right answer!"
-            :option_1 "Wrong answer 1!"
-            :option_2 "Right answer!"
-            :option_3 "Wrong answer 2!"
-            :option_4 "Wrong answer 3!"}
+            :option_1 "Right answer!"
+            :option_2 "Wrong answer!"
+            :option_3 "Wrong answer!"
+            :option_4 "Wrong answer!"}
            (db/get-vocab-question t-conn {:id 1})))
     (is (= 1 (db/delete-vocab-question! t-conn {:id 1})))
     (is (= nil (db/get-vocab-question
