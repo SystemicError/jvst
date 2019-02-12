@@ -21,12 +21,11 @@
 
 (defn generate-test []
   "Creates a question set queue for a new test."
-  ;TODO
   (let [qs (db/get-vocab-questions)
         bands (sort (core/set (map #(:set %) qs)))
         ids-by-band (for [band bands] (map #(:id %) (filter #(= (:set %) band) qs)))]
     (into []
-          (for [ids ids-by-band] (take 10 ids)))))
+          (for [ids ids-by-band] (take 10 (shuffle ids))))))
 
 (defn queue-to-questions [queue]
   "returns a collection of the vocab questions in the first question set in queue"
