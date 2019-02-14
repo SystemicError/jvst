@@ -144,6 +144,12 @@
                                    :vocab_results (str (into results (updates :results)))}))
       (test-page (into request (updates :to-template))))))
 
+(defn process-survey-results [request]
+  "Save the results of the survey, compute the user's vocab size, and pass the result to template."
+  ;TODO
+  (let [dummy (println (request :params))]
+    (layout/render "results.html" request)))
+
 (defn register-page [request]
   (layout/render "register.html" request))
 
@@ -232,6 +238,7 @@
   (GET "/" request (home-page request))
   (GET "/test" request (test-page request))
   (POST "/test" request (process-test-responses request))
+  (POST "/results" request (process-survey-results request))
   (GET "/register" request (register-page request))
   (POST "/register" request (register-user request))
   (POST "/login" request (login-user request))
