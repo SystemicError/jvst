@@ -21,15 +21,15 @@ function showHide(id, trigger)
 	<p>Furigana:  {{question.furigana|safe}}</p>
 	<p>Example:  {{question.example|safe}}</p>
 	<p>
-	<input type="radio" name="response{{ forloop.counter0 }}" value="1">
+	<input type="radio" name="response{{ forloop.counter0 }}" value="{{question.option_1}}">
 	{{question.option_1|safe}}<br>
-	<input type="radio" name="response{{ forloop.counter0 }}" value="2">
+	<input type="radio" name="response{{ forloop.counter0 }}" value="{{question.option_2}}">
 	{{question.option_2|safe}}<br>
-	<input type="radio" name="response{{ forloop.counter0 }}" value="3">
+	<input type="radio" name="response{{ forloop.counter0 }}" value="{{question.option_3}}">
 	{{question.option_3|safe}}<br>
-	<input type="radio" name="response{{ forloop.counter0 }}" value="4">
+	<input type="radio" name="response{{ forloop.counter0 }}" value="{{question.option_4}}">
 	{{question.option_4|safe}}<br>
-	<input type="radio" name="response{{ forloop.counter0 }}" value="0" checked>
+	<input type="radio" name="response{{ forloop.counter0 }}" value="I don't know" checked>
 	I don't know</p>
       {% endfor %}
         <input type="submit" name="submit" value="Submit" />

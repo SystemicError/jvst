@@ -27,10 +27,20 @@
     (into []
           (for [ids ids-by-band] (take 10 (shuffle ids))))))
 
+(defn shuffle-answer-choices [question]
+  "Shuffles the answer choices of a question."
+  (let [choices [(question :option_1)
+                 (question :option_2)
+                 (question :option_3)
+                 (question :option_4)]
+        shuffled (shuffle choices)]
+    (into question (apply hash-map (interleave (list :option_1 :option_2 :option_3 :option_4)
+                                                shuffled)))))
+
 (defn queue-to-questions [queue]
   "returns a collection of the vocab questions in the first question set in queue"
   (for [q (first queue)]
-       (db/get-vocab-question {:id q})))
+       (shuffle-answer-choices (db/get-vocab-question {:id q}))))
 
 (defn record-responses [questions responses]
   "Returns a hashmap of grades/responses for a question set, with timestamp."
@@ -38,16 +48,16 @@
   (let [timestamp (.toString (java.util.Date.))
         ids (for [q questions] (:id q))
         dummy (println (str responses))
-        replies [(edn/read-string (responses :response0))
-                 (edn/read-string (responses :response1))
-                 (edn/read-string (responses :response2))
-                 (edn/read-string (responses :response3))
-                 (edn/read-string (responses :response4))
-                 (edn/read-string (responses :response5))
-                 (edn/read-string (responses :response6))
-                 (edn/read-string (responses :response7))
-                 (edn/read-string (responses :response8))
-                 (edn/read-string (responses :response9))]
+        replies [(responses :response0)
+                 (responses :response1)
+                 (responses :response2)
+                 (responses :response3)
+                 (responses :response4)
+                 (responses :response5)
+                 (responses :response6)
+                 (responses :response7)
+                 (responses :response8)
+                 (responses :response9)]
         dummy (println (str "Replies" replies))]
         (apply hash-map
            (interleave
@@ -55,12 +65,7 @@
              (for [i (range (count ids))]
                (let [question (nth questions i)
                      correct (question :option_1)
-                     response (case (nth replies i)
-                                1 (question :option_1)
-                                2 (question :option_2)
-                                3 (question :option_3)
-                                4 (question :option_4)
-                                "I don't know")]
+                     response (nth replies i)]
                  {:timestamp timestamp
                   :response response
                   :grade (= response correct)}))))))
