@@ -197,11 +197,9 @@
   )
 
 (defn parse-test-bank-tsv
-  "Converts tsv file into edn format."
-  [path]
-  (let [text (slurp path)
-        lines (str/split-lines text)
-        cells (for [line lines] (str/split line #"\t"))
+  "Converts lines of tsv file into database entries."
+  [lines]
+  (let [cells (for [line lines] (str/split line #"\t"))
         labels (list :id :set :headword :furigana :example :option_1 :option_2 :option_3 :option_4)
         questions (for [cell cells] (apply assoc {} (interleave labels cell)))]
     (add-vocab-questions questions))
@@ -209,9 +207,11 @@
 
 (defn load-test-bank [request]
   (if (admin? request)
-    (do
-      (parse-test-bank-tsv "vocab_questions.tsv")
-      (admin-page request))))
+    (let [tempfile (((request :params) :file) :tempfile)
+          reader (clojure.java.io/reader tempfile)]
+      (do
+        (parse-test-bank-tsv (line-seq reader))
+        (admin-page request)))))
 
 
 ;;; USER FUNCTIONALITY
