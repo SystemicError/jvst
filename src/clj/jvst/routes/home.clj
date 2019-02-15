@@ -56,7 +56,7 @@
                  (responses :response6)
                  (responses :response7)
                  (responses :response8)
-                 (responses :response9)]
+                 (responses :response9)]]
         (apply hash-map
            (interleave
              ids
