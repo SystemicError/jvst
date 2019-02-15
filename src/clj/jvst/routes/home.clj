@@ -40,30 +40,23 @@
 (defn queue-to-questions [queue]
   "returns a collection of the vocab questions in the first question set in queue"
   (for [q (first queue)]
-       (shuffle-answer-choices (db/get-vocab-question {:id q}))))
+       (db/get-vocab-question {:id q})))
 
 (defn record-responses [questions responses]
   "Returns a hashmap of grades/responses for a question set, with timestamp."
   ; each entry of form :id {:timestamp timestamp :response response}
   (let [timestamp (.toString (java.util.Date.))
         ids (for [q questions] (:id q))
-        replies [(responses :response0)
-                 (responses :response1)
-                 (responses :response2)
-                 (responses :response3)
-                 (responses :response4)
-                 (responses :response5)
-                 (responses :response6)
-                 (responses :response7)
-                 (responses :response8)
-                 (responses :response9)]]
-        (apply hash-map
+        replies (vals (sort (dissoc responses :__anti-forgery-token)))
+        dummy (println (str "replies:" replies))]
+    (apply hash-map
            (interleave
              ids
              (for [i (range (count ids))]
                (let [question (nth questions i)
                      correct (question :option_1)
-                     response (nth replies i)]
+                     response (nth replies i)
+                     dummy (println (str "correct" correct "\nresponse" response "\n=" (= response correct)))]
                  {:timestamp timestamp
                   :response response
                   :grade (= response correct)}))))))
@@ -72,8 +65,7 @@
 (defn estimate-vocabulary [user]
   "Returns the users estimated vocabulary size.  Assumes ten responses per vocab frequency band."
   ; number correct out of 100 multiplied by 100 = vocab size
-  (let [results (edn/read-string (user :vocab_results))
-        dummy (println (str "USERRESULTS:" results))]
+  (let [results (edn/read-string (user :vocab_results))]
     (* 100 (count (filter #(:grade %) (vals results))))))
 
 ;;; PASSWORD
@@ -116,6 +108,7 @@
         results (if user (edn/read-string (user :vocab_results)) {})
         responses (request :params)
         generated-test (generate-test)
+        shuffler (fn [x] (for [y (queue-to-questions x)] (shuffle-answer-choices y)))
         updates (if queue
                   (if (= :finished queue)
                     ; finished
@@ -128,17 +121,17 @@
                          :to-template {:finished true}
                          :results (record-responses (queue-to-questions queue) responses)}
                         {:queue queue
-                         :to-template {:questions (into [] (queue-to-questions queue))}})
+                         :to-template {:questions (into [] (shuffler queue))}})
                       ; [vector]
                       (if responses
                         {:queue (rest queue)
-                         :to-template {:questions (into [] (queue-to-questions (rest queue)))}
+                         :to-template {:questions (into [] (shuffler (rest queue)))}
                          :results (record-responses (queue-to-questions queue) responses)}
                         {:queue queue
-                         :to-template {:questions (into [] (queue-to-questions queue))}})))
+                         :to-template {:questions (into [] (shuffler queue))}})))
                   ; nil
                   {:queue generated-test
-                   :to-template {:questions (into [] (queue-to-questions generated-test))}})]
+                   :to-template {:questions (into [] (shuffler generated-test))}})]
     (do
       (db/update-question-set-queue! {:email email
                                       :question_set_queue (str (updates :queue))})
@@ -149,15 +142,14 @@
 
 (defn process-survey-results [request]
   "Save the results of the survey, compute the user's vocab size, and pass the result to template."
-  (let [dummy (println (request :params))
-        session (request :session)
+  (let [session (request :session)
         email (if session (session :identity))
         user (if email (get-user email))
         results (dissoc (request :params) :TODO)
         to-template {:vocabulary (estimate-vocabulary (db/get-user {:email email}))}]
     (do
       (db/update-survey-results! {:email email
-                                  :survey_results results})
+                                  :survey_results (str (dissoc results :__anti-forgery-token))})
       (layout/render "results.html" (into request to-template)))))
 
 (defn register-page [request]
