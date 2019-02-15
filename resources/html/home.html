@@ -4,7 +4,11 @@
 {% if session.identity %}
   <div>
     <p>Here's some copy thanking you for logging in.</p>
-    <p>If you haven't finished the test and post-survey, we'll put a link to the test here.</p>
+    {% if finished %}
+    <p>You have completed the test and post-survey.  Thanks!</p>
+    {% else %}
+    <p>You haven't completed the test and post-survey.  <a href="/test">Click here</a> to do so.</p>
+    {% endif %}
   </div>
   <div>
     <p>You can also <a href="/logout">log out</a>.</p>

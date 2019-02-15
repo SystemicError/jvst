@@ -47,16 +47,14 @@
   ; each entry of form :id {:timestamp timestamp :response response}
   (let [timestamp (.toString (java.util.Date.))
         ids (for [q questions] (:id q))
-        replies (vals (sort (dissoc responses :__anti-forgery-token)))
-        dummy (println (str "replies:" replies))]
+        replies (vals (sort (dissoc responses :__anti-forgery-token)))]
     (apply hash-map
            (interleave
              ids
              (for [i (range (count ids))]
                (let [question (nth questions i)
                      correct (question :option_1)
-                     response (nth replies i)
-                     dummy (println (str "correct" correct "\nresponse" response "\n=" (= response correct)))]
+                     response (nth replies i)]
                  {:timestamp timestamp
                   :response response
                   :grade (= response correct)}))))))
@@ -84,7 +82,11 @@
 ;;; PAGES
 
 (defn home-page [request]
-  (layout/render "home.html" request))
+  (let [session (request :session)
+        email (if session (session :identity))
+        user (if email (get-user email))
+        finished (if user (edn/read-string (user :survey_results)))]
+    (layout/render "home.html" (into request {:finished finished}))))
 
 
 (defn test-page [request]
