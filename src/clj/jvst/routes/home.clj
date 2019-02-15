@@ -158,7 +158,7 @@
     (do
       (db/update-survey-results! {:email email
                                   :survey_results results})
-      (layout/render "results.html" to-template))))
+      (layout/render "results.html" (into request to-template)))))
 
 (defn register-page [request]
   (layout/render "register.html" request))
