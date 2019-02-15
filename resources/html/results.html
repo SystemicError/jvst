@@ -5,7 +5,18 @@
   <h4>You know roughly {{vocabulary}} Japanese words*</h4>
   <br />
   <h3>Vocabulary Profile:</h3>
-  TABLE????
+  <table>
+    <tr>
+      <th>Frequency Band</th>
+      <th>Number correct (out of 10)</th>
+    </tr>
+    {% for band-score in band-scores %}
+    <tr>
+      <td>{{forloop.counter}}</td>
+      <td>{{band-score}}</td>
+    </tr>
+    {% endfor %}
+  </table>
   <br />
   <h3>Score Guide</h3>
   <p><b>How to interpret your vocabulary size score:</b></p>

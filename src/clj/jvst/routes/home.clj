@@ -60,6 +60,13 @@
                   :grade (= response correct)}))))))
 
 
+(defn band-scores [user]
+  "Returns the scores in each frequency band based on user results."
+  (let [results (edn/read-string (user :vocab_results))
+        corrects (filter #(:grade (results %)) (keys results))
+        bands (for [i (range 1 11)] (filter #(= i (:set (db/get-vocab-question {:id %}))) corrects))]
+    (for [b bands] (count  b))))
+
 (defn estimate-vocabulary [user]
   "Returns the users estimated vocabulary size.  Assumes ten responses per vocab frequency band."
   ; number correct out of 100 multiplied by 100 = vocab size
@@ -147,11 +154,13 @@
   (let [session (request :session)
         email (if session (session :identity))
         user (if email (get-user email))
-        results (dissoc (request :params) :TODO)
-        to-template {:vocabulary (estimate-vocabulary (db/get-user {:email email}))}]
+        results (dissoc (request :params) :__anti-forgery-token)
+        bands (if user (into [] (band-scores user)))
+        to-template {:vocabulary (estimate-vocabulary (db/get-user {:email email}))
+                     :band-scores bands}]
     (do
       (db/update-survey-results! {:email email
-                                  :survey_results (str (dissoc results :__anti-forgery-token))})
+                                  :survey_results (str results)})
       (layout/render "results.html" (into request to-template)))))
 
 (defn register-page [request]
