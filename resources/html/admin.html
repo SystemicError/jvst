@@ -19,6 +19,7 @@
         <th>Last login</th>
         <th>QSetQueue</th>
         <th>Vocab Results</th>
+        <th>Survey Results</th>
       </tr>
       {% for user in users %}
       <tr>
@@ -30,6 +31,7 @@
         <td><p>{{user.last_login}}</p></td>
         <td><p>{{user.question_set_queue}}</p></td>
         <td><p>{{user.vocab_results}}</p></td>
+        <td><p>{{user.survey_results}}</p></td>
       </tr>
       {% endfor %}
     </table>
