@@ -47,7 +47,6 @@
   ; each entry of form :id {:timestamp timestamp :response response}
   (let [timestamp (.toString (java.util.Date.))
         ids (for [q questions] (:id q))
-        dummy (println (str responses))
         replies [(responses :response0)
                  (responses :response1)
                  (responses :response2)
@@ -58,7 +57,6 @@
                  (responses :response7)
                  (responses :response8)
                  (responses :response9)]
-        dummy (println (str "Replies" replies))]
         (apply hash-map
            (interleave
              ids
@@ -74,7 +72,9 @@
 (defn estimate-vocabulary [user]
   "Returns the users estimated vocabulary size.  Assumes ten responses per vocab frequency band."
   ; number correct out of 100 multiplied by 100 = vocab size
-  (* 100 (count (filter true? (vals (user :vocab_results))))))
+  (let [results (edn/read-string (user :vocab_results))
+        dummy (println (str "USERRESULTS:" results))]
+    (* 100 (count (filter #(:grade %) (vals results))))))
 
 ;;; PASSWORD
 (defn password-hash
@@ -116,8 +116,6 @@
         results (if user (edn/read-string (user :vocab_results)) {})
         responses (request :params)
         generated-test (generate-test)
-        ;dummy (println (str "request" request))
-        dummy (println (str "Queue:" queue "\nresponse:" responses))
         updates (if queue
                   (if (= :finished queue)
                     ; finished
@@ -146,14 +144,21 @@
                                       :question_set_queue (str (updates :queue))})
       (if (updates :results)
         (db/update-vocab-results! {:email email
-                                   :vocab_results (str (into results (updates :results)))}))
+                                   :vocab_results (str (merge results (updates :results)))}))
       (test-page (into request (updates :to-template))))))
 
 (defn process-survey-results [request]
   "Save the results of the survey, compute the user's vocab size, and pass the result to template."
-  ;TODO
-  (let [dummy (println (request :params))]
-    (layout/render "results.html" request)))
+  (let [dummy (println (request :params))
+        session (request :session)
+        email (if session (session :identity))
+        user (if email (get-user email))
+        results (dissoc (request :params) :TODO)
+        to-template {:vocabulary (estimate-vocabulary (db/get-user {:email email}))}]
+    (do
+      (db/update-survey-results! {:email email
+                                  :survey_results results})
+      (layout/render "results.html" to-template))))
 
 (defn register-page [request]
   (layout/render "register.html" request))
