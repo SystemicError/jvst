@@ -99,13 +99,15 @@
 (defn test-page [request]
   (layout/render "test.html" request))
 
+(def language-list ["English" "Mandarin Chinese" "Korean" "Spanish" "Arabic" "Armenian" "Bengali" "Burmese" "Cantonese" "Cherokee" "Dutch" "Farsi" "Filipino" "French" "German" "Greek" "Hakka" "Hawaiian" "Hebrew" "Hindi" "Hmon" "Ilocano" "Irish" "Japanese" "Javanese" "Khmer" "Kurdish" "Laotian" "Malay" "Marathi" "Navajo" "Nepali" "Persian" "Polish" "Portuguese" "Punjabi" "Romanian" "Russian" "Samoan" "Serbo-Croatian" "Sinhala" "Somali" "Sudanese" "Swahili" "Swedish" "Tagalog" "Taiwanese" "Tajik" "Tamil" "Telugu" "Thai" "Turkish" "Ukrainian" "Urdu" "Uzbek" "Vietnamese" "Welsh" "Wu Chinese" "Yiddish" "Yue Chinese"])
+
 (defn process-test-responses [request]
   ; queue      responses          display           to-template  updated-queue     results
   ;
   ; nil        nil                example page      nil          (generate-test)   []
   ; [vector]   answer form        next question set questions    advance one set   push responses
-  ; last page  answer form        post-survey link  finished     :finished         push responses
-  ; :finished  *                  post-survey link  finished     :finished         unmodified
+  ; last page  answer form        post-survey       finished     :finished         push responses
+  ; :finished  *                  post-survey       finished     :finished         unmodified
 
   ; We don't check if results are incomplete, since the default answer is set as "I don't know"
   ; and the csrf field has our back on forged submissions.
@@ -147,7 +149,7 @@
       (if (updates :results)
         (db/update-vocab-results! {:email email
                                    :vocab_results (str (merge results (updates :results)))}))
-      (test-page (into request (updates :to-template))))))
+      (test-page (into request (assoc (updates :to-template) :languages language-list))))))
 
 (defn process-survey-results [request]
   "Save the results of the survey, compute the user's vocab size, and pass the result to template."

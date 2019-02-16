@@ -38,7 +38,7 @@ function showHide(id, trigger)
   {% else %}
     {% if finished %}
       <div>
-	<p>You have finished the test, here's the post-survey.</p>
+	<p>You have completed the vocab test.  Please answer this survey to view your results.</p>
 	<form method="post" action="/results">
 	  {% csrf-field %}
 	  <p>What year were you born?</p>
@@ -50,16 +50,18 @@ function showHide(id, trigger)
 	  </select>
 	  <p>What is your native language?</p>
 	  <select required name="native" id="native" onclick="showHide('native', 'other');">
-  	    <option value="klingon">Klingon</option>
-  	    <option value="vulcan">Vulcan</option>
+            {% for language in languages %}
+	    <option value="{{language}}">{{language}}</option>
+	    {% endfor %}
   	    <option value="other">other:</option>
 	  </select>
 	  <input type="text" name="native-continued" id="native-continued" style="visibility:hidden;">
 	  <br>
 	  <p>What is your dominant language?</p>
 	  <select required name="dominant" id="dominant" onclick="showHide('dominant', 'other');">
-  	    <option value="klingon">Klingon</option>
-  	    <option value="vulcan">Vulcan</option>
+            {% for language in languages %}
+	    <option value="{{language}}">{{language}}</option>
+	    {% endfor %}
   	    <option value="other">other:</option>
 	  </select>
 	  <input type="text" name="dominant-continued" id="dominant-continued" style="visibility:hidden;">
@@ -84,8 +86,9 @@ function showHide(id, trigger)
 	  </select>
 	  <br>
 	  <select name="read-write-continued" id="read-write-continued" style="visibility:hidden;" onclick="showHide('read-write-continued', 'other');">
-  	    <option value="klingon">Klingon</option>
-  	    <option value="vulcan">Vulcan</option>
+            {% for language in languages %}
+	    <option value="{{language}}">{{language}}</option>
+	    {% endfor %}
   	    <option value="other">other:</option>
           </select>
 	  <input type="text" name="read-write-continued-continued" id="read-write-continued-continued" style="visibility:hidden;">
