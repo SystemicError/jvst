@@ -173,12 +173,21 @@
 
 (defn admin-page [request]
   (if (admin? request)
-    (layout/render
-      "admin.html"
-      (into request
-            {:admin admin?
-             :users (for [user (db/get-users)] (dissoc user :pass))
-             :vqs (db/get-vocab-questions)}))
+    (let [users (for [user (db/get-users)]
+                  (let [results (edn/read-string (user :vocab_results))]
+                    (assoc
+                      (dissoc user :pass)
+                      :vocab_results
+                      (sort-by :id
+                               (into []
+                                 (for [id (keys results)]
+                                   (assoc (results id) :id id)))))))]
+      (layout/render
+        "admin.html"
+        (into request
+              {:admin admin?
+               :users users
+               :vqs (db/get-vocab-questions)})))
     (layout/render "admin.html"))
   )
 

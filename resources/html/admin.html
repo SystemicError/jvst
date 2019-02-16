@@ -30,7 +30,13 @@
         <td><p>{{user.admin}}</p></td>
         <td><p>{{user.last_login}}</p></td>
         <td><p>{{user.question_set_queue}}</p></td>
-        <td><p>{{user.vocab_results}}</p></td>
+	<td><p>{% for result in user.vocab_results %}
+		{% if result.grade %}
+		  {{result.id}}
+		{% else %}
+		  <font color="#FF0000">{{result.id}}</font>
+		{% endif %}
+	       {% endfor %}</p></td>
         <td><p>{{user.survey_results}}</p></td>
       </tr>
       {% endfor %}
@@ -68,11 +74,13 @@
       {% endfor %}
     </table>
   </div>
+  <br>
   <div>
     <form action="/load_test_bank" enctype="multipart/form-data" method="post">
       {% csrf-field %}
+      <p>You may upload a tsv file (converted from spreadsheet) of vocab question data.  <b>Warning</b>:  this will overwrite any existing questions and cannot be undone.</p>
       <input type="file" name="file">
-      <input type="submit" name="load_test_bank" value="(Re)load Test Bank" />
+      <input type="submit" name="load_test_bank" value="Upload Test Bank" />
     </form>
   </div>
 {% else %}
