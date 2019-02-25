@@ -37,11 +37,21 @@
     <div style="overflow: scroll;width: 100%;height: 200px;">
       {% include "gdpr.html" %}
     </div>
-    <p>Do you consent to the eu-specific thing, too?</p>
+    <p>Having read this notice, _____, the undersigned, hereby:</p>
     <select required name="eu-consent">
-      <option value="no">No</option>
-      <option value="yes">Yes</option>
+      <option value="no">does not give consent</option>
+      <option value="yes">gives consent</option>
     </select>
+    <p>for the use of his/her special categories of sensitive personal data, and the transfer of special categories of sensitive personal data overseas, for the purpose outlined in this notice.</p>
+    <br>
+    <p>Date</p>
+    <p>Signature (type):<input type="text" name="signature"></p>
+    <br>
+    <p><b>If you have questions about this Consent, please contact:</b></p>
+    <p>NAME: Steve J. Anzalone</p>
+    <p>GEORGIA TECH UNIT: Compliance Officer, Office of Research Integrity Assurance</p>
+    <p>PHONE NUMBER: 470-572-3581</p>
+    <p>EMAIL: Steven.anzalone@gtrc.gatech.edu</p>
   </div>
   <br>
   <input type="submit" name="confirm" value="Confirm" />
