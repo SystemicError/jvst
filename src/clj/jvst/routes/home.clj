@@ -92,15 +92,21 @@
 (defn consent-status [user]
   "Returns a user consent status (agreed/declined/none)."
   (let [consent-results (edn/read-string (:consent_results user))
+        irb-consent (= (:age-18+ consent-results)
+                       (:participate consent-results)
+                       (:read-understand consent-results)
+                       (:store-share consent-results)
+                       "yes")
         dummy (println (str "cr:" consent-results))]
     ;TODO
     (if consent-results
       (if (or
-            (and (= (:eu consent-results) "yes")
-                 (= (:irb-consent consent-results) "yes")
-                 (= (:eu-consent consent-results) "yes"))
-            (and (= (:eu consent-results) "no")
-                 (= (:irb-consent consent-results) "yes")))
+            (and (= (:eu-citizen consent-results)
+                    (:eu-consent consent-results)
+                    "yes")
+                 irb-consent)
+            (and (= (:eu-citizen consent-results) "no")
+                 irb-consent))
         "agreed"
         "declined")
       "none")))

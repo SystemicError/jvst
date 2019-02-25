@@ -4,27 +4,45 @@
 </div>
 <form action="/test" method="post">
   {% csrf-field %}
-<p>Do you consent to the above?</p>
-<select required name="irb-consent">
-  <option value="no">No</option>
-  <option value="yes">Yes</option>
-</select>
-<br>
-<p>Are you a resident of the European Union?</p>
-<select required name="eu" id="eu" onclick="showHide('eu', 'yes');">
-  <option value="no">No</option>
-  <option value="yes">Yes</option>
-</select>
-<div id="eu-continued" style="visibility:hidden;">
-  <div style="overflow: scroll;width: 100%;height: 200px;">
-    {% include "gdpr.html" %}
-  </div>
-  <p>Do you consent to the eu-specific thing, too?</p>
-  <select required name="eu-consent">
+  <p>Please fill out your name and email:</p>
+  <p>First name: <input type="text" name="first-name"></p>
+  <p>Last name: <input type="text" name="last-name"></p>
+  <p>I am age 18 or older.</p>
+  <select required name="age-18+">
+    <option value="yes">Yes</option>
+    <option value="no">No</option>
+  </select>
+  <p>I want to participate in this research and continue with the Japanese Vocabulary Size Test.</p>
+  <select required name="participate">
+    <option value="yes">Yes</option>
+    <option value="no">No, I only want to enter the raffle</option>
+  </select>
+  <p>I have read and understand the information in the consent document.</p>
+  <select required name="read-understand">
+    <option value="yes">Yes</option>
+    <option value="no">No</option>
+  </select>
+  <p>I agree that my anonymized information/data may be stored and shared for future, unspecified research.</p>
+  <select required name="store-share">
+    <option value="yes">Yes</option>
+    <option value="no">No, you may only use my data for THIS study.</option>
+  </select>
+  <br>
+  <p>Are you a citizen of the European Union?</p>
+  <select required name="eu-citizen" id="eu-citizen" onclick="showHide('eu-citizen', 'yes');">
     <option value="no">No</option>
     <option value="yes">Yes</option>
   </select>
-</div>
-<br>
-<input type="submit" name="confirm" value="Confirm" />
+  <div id="eu-citizen-continued" style="visibility:hidden;">
+    <div style="overflow: scroll;width: 100%;height: 200px;">
+      {% include "gdpr.html" %}
+    </div>
+    <p>Do you consent to the eu-specific thing, too?</p>
+    <select required name="eu-consent">
+      <option value="no">No</option>
+      <option value="yes">Yes</option>
+    </select>
+  </div>
+  <br>
+  <input type="submit" name="confirm" value="Confirm" />
 </form>
