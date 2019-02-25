@@ -204,6 +204,9 @@
 (defn about-page [request]
   (layout/render "about.html" request))
 
+(defn logout-page [request]
+  (layout/render "logout.html" request))
+
 (defn admin-page [request]
   (if (admin? request)
     (let [users (for [user (db/get-users)]
@@ -289,7 +292,7 @@
       "That's an invalid login!")))
 
 (defn logout-user [request]
-  (clear-session-identity (home-page (clear-session-identity request))))
+  (clear-session-identity (logout-page (clear-session-identity request))))
 
 (defroutes home-routes
   (GET "/" request (home-page request))
