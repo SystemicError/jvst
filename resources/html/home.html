@@ -1,21 +1,18 @@
 {% extends "base.html" %}
 {% block content %}
 <h3>Welcome to the Japanese Vocabulary Size Test Site</h3>
+
 <p>The Japanese Vocabulary Size Test is a 100-item test that provides a rough approximation of how many written words you know in Japanese up to 10,000 words.  The test was designed based on procedures introduced by Nation & Beglar (2007), but adapted for Japanese.  Items were selected from a word frequency list distributed by the National Institute of Japanese Linguistics (NINJAL, 2011).  This word frequency list was created using the Balanced Corpus of Contemporary Written Japanese (BCCWJ, 2012), a compilation of newspapers, magazines, library books, and blogs.  </p>
+
+
 <h4>Important Notes:</h4>
 <ol>
 <li>This test only measures your receptive written vocabulary size.  It cannot measure how well you aurally comprehend Japanese vocabulary or productively use it in speech or writing.</li>
 <li>Do not use this test as the sole basis for deciding which Japanese course to take.  It will provide helpful information pertaining to your reading ability, but cannot inform your ability in other modes of communication.</li>
 <li>This test was designed for beginning to intermediate Japanese learners.  If your Japanese level is JLPT N1 or above, this test may not be useful for you. </li>
 </ol>
+
 <br />
-<br />
-<h5>References</h5>
-<p>
-Nation, I., & Beglar, D. (2007). A vocabulary size test. The Language Teacher, 31(7), 9-13.
-</p>
-<p>
-National Institute for Japanese Language and Linguistics. Center for Corpus Development. (Ed.). (2011). Balanced Contemporary Corpus of Written Japanese. Word List. [Gendai nihongokakikotoba kinkou koupasu. Goi hyou.]. Retrieved from <a href="http://pj.ninjal.ac.jp/corpus_center/bccwj/doc/report/JC-P-10-01.pdf">http://pj.ninjal.ac.jp/corpus_center/bccwj/doc/report/JC-P-10-01.pdf</a>.
 </p>
 
 {% if session.identity %}
@@ -31,9 +28,9 @@ National Institute for Japanese Language and Linguistics. Center for Corpus Deve
   </div>
 {% else %}
   <div>
-    <p>If you have an account, you can log in.</p>
+    <p>If you have an account, you can log in to take the test.</p>
     {% include "login.html" %}
-    Otherwise, you can <a href="/register">sign up</a>.
+    Otherwise, you can <a href="/register">register</a>.
   </div>
 {% endif %}
 
