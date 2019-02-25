@@ -1,0 +1,30 @@
+<p>Here are some consent forms to which you must agree to take the test.</p>
+<div style="overflow: scroll;width: 100%;height: 200px;">
+  {% include "irb.html" %}
+</div>
+<form action="/test" method="post">
+  {% csrf-field %}
+<p>Do you consent to the above?</p>
+<select required name="irb-consent">
+  <option value="no">No</option>
+  <option value="yes">Yes</option>
+</select>
+<br>
+<p>Are you a resident of the European Union?</p>
+<select required name="eu" id="eu" onclick="showHide('eu', 'yes');">
+  <option value="no">No</option>
+  <option value="yes">Yes</option>
+</select>
+<div id="eu-continued" style="visibility:hidden;">
+  <div style="overflow: scroll;width: 100%;height: 200px;">
+    {% include "gdpr.html" %}
+  </div>
+  <p>Do you consent to the eu-specific thing, too?</p>
+  <select required name="eu-consent">
+    <option value="no">No</option>
+    <option value="yes">Yes</option>
+  </select>
+</div>
+<br>
+<input type="submit" name="confirm" value="Confirm" />
+</form>

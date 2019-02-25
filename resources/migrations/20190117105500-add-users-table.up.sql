@@ -3,9 +3,8 @@ CREATE TABLE users
  first_name VARCHAR(30),
  last_name VARCHAR(30),
  admin BOOLEAN,
- last_login TIMESTAMP,
- is_active BOOLEAN,
  pass VARCHAR(300),
+ consent_results NVARCHAR(MAX),
  question_set_queue NVARCHAR(MAX),
  vocab_results NVARCHAR(MAX),
  survey_results NVARCHAR(MAX));

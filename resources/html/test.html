@@ -4,147 +4,63 @@
 function showHide(id, trigger)
 {
   if(document.getElementById(id).value == trigger)
+  {
     document.getElementById(id + '-continued').style.visibility = 'visible';
+    //document.getElementById(id + '-continued').style.height = '200px';
+  }
   else
     document.getElementById(id + '-continued').style.visibility = 'hidden';
+    //document.getElementById(id + '-continued').style.height = '0px';
 }
 </script>
 <h2>Japanese Vocabulary Size Test</h2>
 {% if session.identity %}
-  {% if questions %}
-    <div>
-      <p>Here is your next set of questions.</p>
-      <form method="post" action="/test">
-      {% csrf-field %}
-      {% for question in questions %}
-        <p>Headword:  {{question.headword|safe}}</p>
-	<p>Furigana:  {{question.furigana|safe}}</p>
-	<p>Example:  {{question.example|safe}}</p>
-	<p>
-	<input type="radio" name="response{{ forloop.counter0 }}" value="{{question.option_1}}">
-	{{question.option_1|safe}}<br>
-	<input type="radio" name="response{{ forloop.counter0 }}" value="{{question.option_2}}">
-	{{question.option_2|safe}}<br>
-	<input type="radio" name="response{{ forloop.counter0 }}" value="{{question.option_3}}">
-	{{question.option_3|safe}}<br>
-	<input type="radio" name="response{{ forloop.counter0 }}" value="{{question.option_4}}">
-	{{question.option_4|safe}}<br>
-	<input type="radio" name="response{{ forloop.counter0 }}" value="I don't know" checked>
-	I don't know</p>
-      {% endfor %}
-        <input type="submit" name="submit" value="Submit" />
-      </form>
-    </div>
-  {% else %}
-    {% if finished %}
+  {% ifequal consent "agreed" %}
+    {% if questions %}
       <div>
-	<p>You have completed the vocab test.  Please answer this survey to view your results.</p>
-	<form method="post" action="/results">
-	  {% csrf-field %}
-	  <p>What year were you born?</p>
-	  <input type="number" name="birthyear" value="2019" min="1940" max="2019">
-	  <p>What was your biological sex at birth?</p>
-	  <select required name="sex">
-  	    <option value="male">Male</option>
-  	    <option value="female">Female</option>
-	  </select>
-	  <p>What is your native language?</p>
-	  <select required name="native" id="native" onclick="showHide('native', 'other');">
-            {% for language in languages %}
-	    <option value="{{language}}">{{language}}</option>
-	    {% endfor %}
-  	    <option value="other">other:</option>
-	  </select>
-	  <input type="text" name="native-continued" id="native-continued" style="visibility:hidden;">
-	  <br>
-	  <p>What is your dominant language?</p>
-	  <select required name="dominant" id="dominant" onclick="showHide('dominant', 'other');">
-            {% for language in languages %}
-	    <option value="{{language}}">{{language}}</option>
-	    {% endfor %}
-  	    <option value="other">other:</option>
-	  </select>
-	  <input type="text" name="dominant-continued" id="dominant-continued" style="visibility:hidden;">
-	  <br>
-	  <p>Did anyone in your home speak Japanese when you were growing up?</p>
-	  <select required name="home" id="home" onclick="showHide('home', 'yes');">
-  	    <option value="no">No</option>
-  	    <option value="yes">Yes</option>
-	  </select>
-	  <br>
-	  <select name="home-continued" id="home-continued" style="visibility:hidden;">
-  	    <option value="mother">Mother</option>
-  	    <option value="father">Father</option>
-  	    <option value="grandparent">Grandparent</option>
-  	    <option value="sibling">Sibling</option>
-  	    <option value="other">other</option>
-	  </select>
-	  <p>Can you read and write in other languages besides English?</p>
-	  <select required name="read-write" id="read-write" onclick="showHide('read-write', 'yes');">
-  	    <option value="no">No</option>
-  	    <option value="yes">Yes</option>
-	  </select>
-	  <br>
-	  <select name="read-write-continued" id="read-write-continued" style="visibility:hidden;" onclick="showHide('read-write-continued', 'other');">
-            {% for language in languages %}
-	    <option value="{{language}}">{{language}}</option>
-	    {% endfor %}
-  	    <option value="other">other:</option>
-          </select>
-	  <input type="text" name="read-write-continued-continued" id="read-write-continued-continued" style="visibility:hidden;">
-	  <br>
-	  <p>How long have you studied Japanese?</p>
-	  <p><input type="number" name="study-years" value="0" min="0" max="99">Years
-	  <input type="number" name="study-months" value="0" min="0" max="11">Months
-	  <input type="number" name="study-days" value="0" min="0" max="31">Days</p>
-	  <p>Have you ever visited a Japanese speaking country?</p>
-	  <select required name="visited" id="visited" onclick="showHide('visited', 'yes');">
-  	    <option value="no">No</option>
-  	    <option value="yes">Yes</option>
-	  </select>
-	  <div id="visited-continued" style="visibility:hidden;">
-	    <p>If so, how long were you there?</p>
-	    <p><input type="number" name="visited-years" value="0" min="0" max="99">Years
-	    <input type="number" name="visited-months" value="0" min="0" max="11">Months
-	    <input type="number" name="visited-days" value="0" min="0" max="31">Days</p>
-	  </div>
-	  <p>How many semesters of Japanese did you take in high school?</p>
-	  <p><input type="number" name="high-school-semesters" value="0" min="0" max="20"></p>
-	  <p>How many semesters of Japanese have you taken in a college?</p>
-	  <p><input type="number" name="college-semesters" value="0" min="0" max="20"></p>
-	  <p>Are you currently enrolled in a Japanese course in high school or university?</p>
-	  <select required name="enrolled" id="enrolled" onclick="showHide('enrolled', 'yes');">
-  	    <option value="no">No</option>
-  	    <option value="yes">Yes</option>
-	  </select>
-	  <div id="enrolled-continued" style="visibility:hidden;">
-	    <p>What semester of Japanese are you currently enrolled in?</p>
-	    <p><input type="number" name="current-semester" value="0" min="0" max="20"></p>
-	  </div>
-	  <p>What other ways have you studied Japanese?</p>
-	  <input type="textarea" name="ways" rows="10" cols="40">
-	  <p>Did you use a dictionary while taking this test?</p>
-	  <select required name="enrolled">
-  	    <option value="no">No</option>
-  	    <option value="yes">Yes</option>
-	  </select>
-	  <br>
-	  <br>
-	  <input type="submit" name="submit" value="View vocab results" />
-	  <br>
-	</form>
+        <p>Here is your next set of questions.</p>
+        <form method="post" action="/test">
+          {% csrf-field %}
+          {% for question in questions %}
+            <p>Headword:  {{question.headword|safe}}</p>
+            <p>Furigana:  {{question.furigana|safe}}</p>
+	    <p>Example:  {{question.example|safe}}</p>
+	    <p>
+	    <input type="radio" name="response{{ forloop.counter0 }}" value="{{question.option_1}}">
+	    {{question.option_1|safe}}<br>
+	    <input type="radio" name="response{{ forloop.counter0 }}" value="{{question.option_2}}">
+	    {{question.option_2|safe}}<br>
+	    <input type="radio" name="response{{ forloop.counter0 }}" value="{{question.option_3}}">
+	    {{question.option_3|safe}}<br>
+	    <input type="radio" name="response{{ forloop.counter0 }}" value="{{question.option_4}}">
+	    {{question.option_4|safe}}<br>
+	    <input type="radio" name="response{{ forloop.counter0 }}" value="I don't know" checked>
+	    I don't know</p>
+          {% endfor %}
+          <input type="submit" name="submit" value="Submit" />
+        </form>
       </div>
     {% else %}
-      <div>
-        <p>Since no questions were sent from the backend but you're not finished with the test, here's some copy about starting/resuming the test.</p>
-	<br>
-	<form action="/test" method="post">
-          {% csrf-field %}
-          <input type="submit" name="begin" value="Begin Test" />
-	</form>
-      </div>
+      {% if finished %}
+        {% include "survey.html" %}
+      {% else %}
+        <div>
+          <p>Since no questions were sent from the backend but you're not finished with the test, here's some copy about starting/resuming the test, and probably an example problem.</p>
+          <br>
+          <form action="/test" method="post">
+            {% csrf-field %}
+            <input type="submit" name="begin" value="Begin Test" />
+          </form>
+        </div>
+      {% endif %}
     {% endif %}
-  {% endif %}
+  {% endifequal %}
+  {% ifequal consent "declined" %}
+    <p>Here's some copy indicating that you have declined consent and cannot take the test.</p>
+  {% endifequal %}
+  {% ifequal consent "none" %}
+    {% include "consent.html" %}
+  {% endifequal %}
 {% else %}
   <div>
     <p>Please log in before continuing:</p>

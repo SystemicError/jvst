@@ -86,6 +86,25 @@
         email (if session (session :identity))]
     (= email "admin")))
 
+
+;;; CONSENT
+
+(defn consent-status [user]
+  "Returns a user consent status (agreed/declined/none)."
+  (let [consent-results (edn/read-string (:consent_results user))
+        dummy (println (str "cr:" consent-results))]
+    ;TODO
+    (if consent-results
+      (if (or
+            (and (= (:eu consent-results) "yes")
+                 (= (:irb-consent consent-results) "yes")
+                 (= (:eu-consent consent-results) "yes"))
+            (and (= (:eu consent-results) "no")
+                 (= (:irb-consent consent-results) "yes")))
+        "agreed"
+        "declined")
+      "none")))
+
 ;;; PAGES
 
 (defn home-page [request]
@@ -97,14 +116,21 @@
 
 
 (defn test-page [request]
-  (layout/render "test.html" request))
+  (let [session (request :session)
+        email (if session (session :identity))
+        user (if email (get-user email))
+        consent (if user (consent-status user))]
+  (layout/render "test.html" (into request {:consent consent}))))
 
 (def language-list ["English" "Mandarin Chinese" "Korean" "Spanish" "Arabic" "Armenian" "Bengali" "Burmese" "Cantonese" "Cherokee" "Dutch" "Farsi" "Filipino" "French" "German" "Greek" "Hakka" "Hawaiian" "Hebrew" "Hindi" "Hmon" "Ilocano" "Irish" "Japanese" "Javanese" "Khmer" "Kurdish" "Laotian" "Malay" "Marathi" "Navajo" "Nepali" "Persian" "Polish" "Portuguese" "Punjabi" "Romanian" "Russian" "Samoan" "Serbo-Croatian" "Sinhala" "Somali" "Sudanese" "Swahili" "Swedish" "Tagalog" "Taiwanese" "Tajik" "Tamil" "Telugu" "Thai" "Turkish" "Ukrainian" "Urdu" "Uzbek" "Vietnamese" "Welsh" "Wu Chinese" "Yiddish" "Yue Chinese"])
 
 (defn process-test-responses [request]
   ; queue      responses          display           to-template  updated-queue     results
   ;
-  ; nil        nil                example page      nil          (generate-test)   []
+  ; nil        nil                consent forms     nil          nil               []
+  ; nil        consent            example page      nil          :consented        []
+  ; nil        nonconsent         done              nil          :nonconsented     []
+  ; :consented nil                example page      nil          (generate-test)   []
   ; [vector]   answer form        next question set questions    advance one set   push responses
   ; last page  answer form        post-survey       finished     :finished         push responses
   ; :finished  *                  post-survey       finished     :finished         unmodified
@@ -120,29 +146,36 @@
         responses (request :params)
         generated-test (generate-test)
         shuffler (fn [x] (for [y (queue-to-questions x)] (shuffle-answer-choices y)))
-        updates (if queue
-                  (if (= :finished queue)
-                    ; finished
-                    {:queue :finished
-                     :to-template {:finished true}}
-                    (if (= 1 (count queue))
-                      ; last page
-                      (if responses
-                        {:queue :finished
-                         :to-template {:finished true}
-                         :results (record-responses (queue-to-questions queue) responses)}
-                        {:queue queue
-                         :to-template {:questions (into [] (shuffler queue))}})
-                      ; [vector]
-                      (if responses
-                        {:queue (rest queue)
-                         :to-template {:questions (into [] (shuffler (rest queue)))}
-                         :results (record-responses (queue-to-questions queue) responses)}
-                        {:queue queue
-                         :to-template {:questions (into [] (shuffler queue))}})))
-                  ; nil
-                  {:queue generated-test
-                   :to-template {:questions (into [] (shuffler generated-test))}})]
+        consent-response (if (:confirm responses)
+                           (db/update-consent-results! {:email email
+                                                        :consent_results (str (dissoc responses :__anti-forgery-token :confirm))}))
+        updates (if consent-response
+                  ; don't update anything if we just got a consent response
+                  {:queue nil
+                   :to-template nil}
+                  (if queue
+                    (if (= :finished queue)
+                      ; finished
+                      {:queue :finished
+                       :to-template {:finished true}}
+                      (if (= 1 (count queue))
+                        ; last page
+                        (if responses
+                          {:queue :finished
+                           :to-template {:finished true}
+                           :results (record-responses (queue-to-questions queue) responses)}
+                          {:queue queue
+                           :to-template {:questions (into [] (shuffler queue))}})
+                        ; [vector]
+                        (if (:submit responses)
+                          {:queue (rest queue)
+                           :to-template {:questions (into [] (shuffler (rest queue)))}
+                           :results (record-responses (queue-to-questions queue) responses)}
+                          {:queue queue
+                           :to-template {:questions (into [] (shuffler queue))}})))
+                    ; nil
+                    {:queue generated-test
+                     :to-template {:questions (into [] (shuffler generated-test))}}))]
     (do
       (db/update-question-set-queue! {:email email
                                       :question_set_queue (str (updates :queue))})

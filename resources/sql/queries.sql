@@ -34,6 +34,12 @@ UPDATE users
 SET survey_results = :survey_results
 WHERE email = :email
 
+-- :name update-consent-results! :! :n
+-- :doc update consent form results
+UPDATE users
+SET consent_results = :consent_results
+WHERE email = :email
+
 -- :name get-user :? :1
 -- :doc retrieves a user record given email
 SELECT * FROM users
