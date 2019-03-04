@@ -79,12 +79,16 @@
   (hashers/derive password {:alg :bcrypt+sha512}))
 
 (defn validate-password [email password]
-  (hashers/check password (get (get-user email) :pass)))
+  (let [user (get-user email)
+        pass (:pass user)]
+  (hashers/check password (get (get-user email) :pass))))
 
 (defn admin? [request]
   (let [session (request :session)
-        email (if session (session :identity))]
-    (= email "admin@admin.admin")))
+        email (if session (session :identity))
+        super-users (str/split (slurp "superusers.txt") #"\n")]
+    (some #{email} super-users)))
+;    (= email "admin@admin.admin")))
 
 
 ;;; CONSENT
@@ -277,7 +281,7 @@
 
 (defn register-user [{params :params}]
   ;;; TODO - add validation
-  (let [email (get params :email)
+  (let [email (str/lower-case (get params :email))
         password (get params :password)
         first-name (get params :first-name)
         last-name (get params :last-name)
