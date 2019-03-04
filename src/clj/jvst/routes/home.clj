@@ -84,7 +84,7 @@
 (defn admin? [request]
   (let [session (request :session)
         email (if session (session :identity))]
-    (= email "admin")))
+    (= email "admin@admin.admin")))
 
 
 ;;; CONSENT
