@@ -1,13 +1,30 @@
+<script>
+function wrong()
+{
+  alert("Incorrect.  That is not the closest meaning to 沸く.  Please try again.");
+}
+function right()
+{
+  alert("Correct!  Boil is the right answer.  You are ready to start the real test.");
+}
+function dunno()
+{
+  alert("If you do not know the closest translation to 沸く then you are correct in selectiong \"I don't know.\"  For practice, please try again until you select the correct answer.");
+}
+</script>
 <p><b>Do NOT use a dictionary when taking this test.</b></p>
 <p>If you show signs of using a dictionary (taking too long on certain questions), then your data will not be usable for the study.</p>
 <p><b>Instructions</b></p>
 <p>Please choose the English word with the closest meaning to the Japanese word.  Do not guess.  If you do not know a word, select "I don't know" or skip the question.</p>
 <p>Try not to spend too much time (e.g., more than 30 seconds) on each question.  Instead, skip it and and move on to the next question.</p>
 <p>Try with this example question:</p>
-<p><b>湧く (waku)</b></p>
+<p>Headword:   沸く</p>
+<p>Furigana:  わく</p>
+<p>Example:  ブクブクと<b style="color:blue;">沸(わ)く</b>いてきた。</p>
 <form>
-  <p><input type="radio" name="example">boil</p>
-  <p><input type="radio" name="example">overflow</p>
-  <p><input type="radio" name="example">illuminate</p>
-  <p><input type="radio" name="example" checked>I don't know</p>
+  <p><input type="radio" name="example" onclick="wrong();">fall</p>
+  <p><input type="radio" name="example" onclick="right();">boil</p>
+  <p><input type="radio" name="example" onclick="wrong();">overflow</p>
+  <p><input type="radio" name="example" onclick="wrong();">illuminate</p>
+  <p><input type="radio" name="example" onclick="dunno();">I don't know</p>
 </form>
