@@ -6,14 +6,13 @@ function showHide(id, trigger)
   if(document.getElementById(id).value == trigger)
   {
     document.getElementById(id + '-continued').style.visibility = 'visible';
-    //document.getElementById(id + '-continued').style.height = '200px';
+//    document.getElementById(id + '-continued').style.height = 200 + 'px';
   }
   else
     document.getElementById(id + '-continued').style.visibility = 'hidden';
-    //document.getElementById(id + '-continued').style.height = '0px';
+//    document.getElementById(id + '-continued').style.height = 10 + 'px';
 }
 </script>
-<h2>Japanese Vocabulary Size Test</h2>
 {% if session.identity %}
   {% ifequal consent "agreed" %}
     {% if questions %}
@@ -45,7 +44,7 @@ function showHide(id, trigger)
         {% include "survey.html" %}
       {% else %}
         <div>
-          <p>Since no questions were sent from the backend but you're not finished with the test, here's some copy about starting/resuming the test, and probably an example problem.</p>
+          {% include "example_problem.html" %}
           <br>
           <form action="/test" method="post">
             {% csrf-field %}
