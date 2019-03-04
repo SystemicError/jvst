@@ -88,7 +88,6 @@
         email (if session (session :identity))
         super-users (str/split (slurp "superusers.txt") #"\n")]
     (some #{email} super-users)))
-;    (= email "admin@admin.admin")))
 
 
 ;;; CONSENT
@@ -101,8 +100,8 @@
                        (:read-understand consent-results)
                        (:store-share consent-results)
                        "yes")
-        dummy (println (str "cr:" consent-results))]
-    ;TODO
+       ; dummy (println (str "cr:" consent-results))
+        ]
     (if consent-results
       (if (or
             (and (= (:eu-citizen consent-results)
