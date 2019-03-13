@@ -16,7 +16,7 @@
     {% endfor %}
     <option value="other">other:</option>
   </select>
-  <input type="text" name="native-continued" id="native-continued" style="visibility:hidden;">
+  <input type="text" name="native-continued" id="native-continued" style="display:none;">
   <br>
   <p>What is your dominant language?</p>
   <select required name="dominant" id="dominant" onclick="showHide('dominant', 'other');">
@@ -25,7 +25,7 @@
     {% endfor %}
     <option value="other">other:</option>
   </select>
-  <input type="text" name="dominant-continued" id="dominant-continued" style="visibility:hidden;">
+  <input type="text" name="dominant-continued" id="dominant-continued" style="display:none;">
   <br>
   <p>Did anyone in your home speak Japanese when you were growing up?</p>
   <select required name="home" id="home" onclick="showHide('home', 'yes');">
@@ -33,7 +33,7 @@
     <option value="yes">Yes</option>
   </select>
   <br>
-  <select name="home-continued" id="home-continued" style="visibility:hidden;">
+  <select name="home-continued" id="home-continued" style="display:none;">
     <option value="mother">Mother</option>
     <option value="father">Father</option>
     <option value="grandparent">Grandparent</option>
@@ -46,13 +46,13 @@
     <option value="yes">Yes</option>
   </select>
   <br>
-  <select name="read-write-continued" id="read-write-continued" style="visibility:hidden;" onclick="showHide('read-write-continued', 'other');">
+  <select name="read-write-continued" id="read-write-continued" style="display:none;" onclick="showHide('read-write-continued', 'other');">
     {% for language in languages %}
     <option value="{{language}}">{{language}}</option>
     {% endfor %}
     <option value="other">other:</option>
   </select>
-  <input type="text" name="read-write-continued-continued" id="read-write-continued-continued" style="visibility:hidden;">
+  <input type="text" name="read-write-continued-continued" id="read-write-continued-continued" style="display:none;">
   <br>
   <p>How long have you studied Japanese?</p>
   <p><input type="number" name="study-years" value="0" min="0" max="99">Years
@@ -63,7 +63,7 @@
     <option value="no">No</option>
     <option value="yes">Yes</option>
   </select>
-  <div id="visited-continued" style="visibility:hidden;">
+  <div id="visited-continued" style="display:none;">
     <p>If so, how long were you there?</p>
     <p><input type="number" name="visited-years" value="0" min="0" max="99">Years
     <input type="number" name="visited-months" value="0" min="0" max="11">Months
@@ -78,7 +78,7 @@
     <option value="no">No</option>
     <option value="yes">Yes</option>
   </select>
-  <div id="enrolled-continued" style="visibility:hidden;">
+  <div id="enrolled-continued" style="display:none;">
     <p>What semester of Japanese are you currently enrolled in?</p>
     <p><input type="number" name="current-semester" value="0" min="0" max="20"></p>
   </div>
