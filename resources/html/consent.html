@@ -1,12 +1,16 @@
-<p>Here are some consent forms to which you must agree to take the test.</p>
 <div style="overflow: scroll;width: 100%;height: 200px;">
   {% include "irb.html" %}
 </div>
 <form action="/test" method="post">
   {% csrf-field %}
-  <p>Please fill out your name and email:</p>
+  <p>Please fill out your first and last name:</p>
   <p>First name: <input type="text" name="first-name"></p>
   <p>Last name: <input type="text" name="last-name"></p>
+  <p>I am a resident of the state of Georgia, U.S.A.</p>
+  <select required name="georgia">
+    <option value="yes">Yes</option>
+    <option value="no">No</option>
+  </select>
   <p>I am age 18 or older.</p>
   <select required name="age-18+">
     <option value="yes">Yes</option>
@@ -15,7 +19,8 @@
   <p>I want to participate in this research and continue with the Japanese Vocabulary Size Test.</p>
   <select required name="participate">
     <option value="yes">Yes</option>
-    <option value="no">No, I only want to enter the raffle</option>
+    <option value="no">No, I only want to take the JVST</option>
+    <option value="raffle">No, I only want to enter the raffle</option>
   </select>
   <p>I have read and understand the information in the consent document.</p>
   <select required name="read-understand">
