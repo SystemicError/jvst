@@ -1,63 +1,180 @@
+<script type='text/javascript'>
+function updateUndersigned()
+{
+  var us = document.getElementById("undersigned");
+  var ga_us = document.getElementById("ga-undersigned");
+  var fn = document.getElementById("first-name");
+  var ln = document.getElementById("last-name");
+  us.innerHTML = fn.value + " " + ln.value;
+  ga_us.innerHTML = fn.value + " " + ln.value;
+}
+function toggleNext(q, trigger, next)
+{
+  var response = document.getElementById(q).value;
+  var next = document.getElementById(next);
+  if(response == trigger)
+  {
+    next.style.display = "inline";
+    document.getElementById("confirm").style.display = "none";
+  }
+  else
+  {
+    next.style.display = "none";
+    document.getElementById("confirm").style.display = "inline";
+  }
+}
+function toggleFork(q, trigger1, next1, trigger2, next2)
+{
+  var response = document.getElementById(q).value;
+  var next1 = document.getElementById(next1);
+  var next2 = document.getElementById(next2);
+  if(response == trigger1)
+  {
+    next1.style.display = "inline";
+    next2.style.display = "none";
+  }
+  if(response == trigger2)
+  {
+    next1.style.display = "none";
+    next2.style.display = "inline";
+  }
+}
+</script>
 <div style="overflow: scroll;width: 100%;height: 200px;">
   {% include "irb.html" %}
 </div>
-<form action="/test" method="post">
+<form action="/test" id="consent" method="post">
   {% csrf-field %}
   <p>Please fill out your first and last name:</p>
-  <p>First name: <input type="text" name="first-name"></p>
-  <p>Last name: <input type="text" name="last-name"></p>
-  <p>I am a resident of the state of Georgia, U.S.A.</p>
-  <select required name="georgia">
-    <option value="yes">Yes</option>
-    <option value="no">No</option>
-  </select>
+  <p>First name: <input required type="text" id="first-name" name="first-name" oninput="updateUndersigned();"></p>
+  <p>Last name: <input required type="text" id="last-name" name="last-name" oninput="updateUndersigned();"></p>
   <p>I am age 18 or older.</p>
-  <select required name="age-18+">
+  <select required id="age-18+" name="age-18+" onchange="toggleNext('age-18+','yes','georgia-div');">
+    <option disabled selected value></option>
     <option value="yes">Yes</option>
     <option value="no">No</option>
   </select>
-  <p>I want to participate in this research and continue with the Japanese Vocabulary Size Test.</p>
-  <select required name="participate">
-    <option value="yes">Yes</option>
-    <option value="no">No, I only want to take the JVST</option>
-    <option value="raffle">No, I only want to enter the raffle</option>
-  </select>
-  <p>I have read and understand the information in the consent document.</p>
-  <select required name="read-understand">
-    <option value="yes">Yes</option>
-    <option value="no">No</option>
-  </select>
-  <p>I agree that my anonymized information/data may be stored and shared for future, unspecified research.</p>
-  <select required name="store-share">
-    <option value="yes">Yes</option>
-    <option value="no">No, you may only use my data for THIS study.</option>
-  </select>
-  <br>
-  <p>Are you a citizen of the European Union?</p>
-  <select required name="eu-citizen" id="eu-citizen" onclick="showHide('eu-citizen', 'yes');">
-    <option value="no">No</option>
-    <option value="yes">Yes</option>
-  </select>
-  <div id="eu-citizen-continued" style="visibility:hidden;">
-    <div style="overflow: scroll;width: 100%;height: 200px;">
-      {% include "gdpr.html" %}
-    </div>
-    <p>Having read this notice, _____, the undersigned, hereby:</p>
-    <select required name="eu-consent">
-      <option value="no">does not give consent</option>
-      <option value="yes">gives consent</option>
+  <div id="georgia-div" style="display:none;">
+    <p>I am a resident of the state of Georgia, U.S.A.</p>
+    <select required id="georgia" name="georgia" onchange="toggleFork('georgia','yes','ga-participate-div','no','read-understand-div');">
+      <option disabled selected value></option>
+      <option value="yes">Yes</option>
+      <option value="no">No</option>
     </select>
-    <p>for the use of his/her special categories of sensitive personal data, and the transfer of special categories of sensitive personal data overseas, for the purpose outlined in this notice.</p>
-    <br>
-    <p>Date</p>
-    <p>Signature (type):<input type="text" name="signature"></p>
-    <br>
-    <p><b>If you have questions about this Consent, please contact:</b></p>
-    <p>NAME: Steve J. Anzalone</p>
-    <p>GEORGIA TECH UNIT: Compliance Officer, Office of Research Integrity Assurance</p>
-    <p>PHONE NUMBER: 470-572-3581</p>
-    <p>EMAIL: Steven.anzalone@gtrc.gatech.edu</p>
+    <div id="ga-participate-div" style="display:none">
+      <p>I want to participate in this research and continue with the Japanese Vocabulary Size Test.</p>
+      <select id="ga-participate" name="ga-participate" onchange="toggleNext('ga-participate','yes','ga-read-understand-div');">
+        <option disabled selected value></option>
+        <option value="yes">Yes</option>
+        <option value="no">No, I only want to take the JVST</option>
+        <option value="raffle">No, I only want to enter the raffle</option>
+      </select>
+      <div id="ga-read-understand-div" style="display:none">
+        <p>I have read and understand the information in the consent document.</p>
+        <select id="ga-read-understand" name="ga-read-understand" onchange="toggleNext('ga-read-understand','yes','ga-store-share-div');">
+          <option disabled selected value></option>
+          <option value="yes">Yes</option>
+          <option value="no">No</option>
+        </select>
+        <div id="ga-store-share-div" style="display:none">
+          <p>I agree that my anonymized information/data may be stored and shared for future, unspecified research.</p>
+          <select id="ga-store-share" name="ga-store-share" onchange="toggleNext('ga-store-share','yes','ga-eu-citizen-div');">
+            <option disabled selected value></option>
+            <option value="yes">Yes</option>
+            <option value="no">No, you may only use my data for THIS study.</option>
+          </select>
+          <div id="ga-eu-citizen-div" style="display:none">
+            <p>Are you a citizen of the European Union?</p>
+            <select name="ga-eu-citizen" id="ga-eu-citizen" onchange="toggleNext('ga-eu-citizen','yes','ga-eu-citizen-continued');">
+              <option disabled selected value></option>
+              <option value="yes">Yes</option>
+              <option value="no">No</option>
+            </select>
+            <div id="ga-eu-citizen-continued" style="display:none;">
+              <div style="overflow: scroll;width: 100%;height: 200px;">
+                {% include "gdpr.html" %}
+              </div>
+	      <p>Having read this notice, <text id="ga-undersigned"></text>, the undersigned, hereby:</p>
+              <select name="eu-consent">
+                <option disabled selected value></option>
+                <option value="yes">gives consent</option>
+                <option value="no">does not give consent</option>
+              </select>
+              <p>for the use of his/her special categories of sensitive personal data, and the transfer of special categories of sensitive personal data overseas, for the purpose outlined in this notice.</p>
+              <br>
+              <p>Date</p>
+              <p>Signature (type):<input type="text" name="signature"></p>
+              <br>
+              <p><b>If you have questions about this Consent, please contact:</b></p>
+              <p>NAME: Steve J. Anzalone</p>
+              <p>GEORGIA TECH UNIT: Compliance Officer, Office of Research Integrity Assurance</p>
+              <p>PHONE NUMBER: 470-572-3581</p>
+              <p>EMAIL: Steven.anzalone@gtrc.gatech.edu</p>
+	      <br>
+	      <br>
+              <input type="submit" name="confirm" value="Confirm"/>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div id="read-understand-div" style="display:none">
+      <p>I have read and understand the information in the consent document.</p>
+      <select id="read-understand" name="read-understand" onchange="toggleNext('read-understand','yes','store-share-div');">
+        <option disabled selected value></option>
+        <option value="yes">Yes</option>
+        <option value="no">No</option>
+      </select>
+      <div id="store-share-div" style="display:none">
+        <p>I agree that my anonymized information/data may be stored and shared for future, unspecified research.</p>
+        <select id="store-share" name="store-share" onchange="toggleNext('store-share','yes','participate-div');">
+          <option disabled selected value></option>
+          <option value="yes">Yes</option>
+          <option value="no">No, you may only use my data for THIS study.</option>
+        </select>
+        <div id="participate-div" style="display:none">
+          <p>I want to participate in this research and continue with the Japanese Vocabulary Size Test.</p>
+          <select id="participate" name="participate" onchange="toggleNext('participate','yes','eu-citizen-div');">
+            <option disabled selected value></option>
+            <option value="yes">Yes</option>
+            <option value="no">No, I only want to take the JVST</option>
+	  </select>
+          <div id="eu-citizen-div" style="display:none">
+            <p>Are you a citizen of the European Union?</p>
+            <select name="eu-citizen" id="eu-citizen" onchange="toggleNext('eu-citizen','yes','eu-citizen-continued');">
+              <option disabled selected value></option>
+              <option value="yes">Yes</option>
+              <option value="no">No</option>
+            </select>
+            <div id="eu-citizen-continued" style="display:none;">
+              <div style="overflow: scroll;width: 100%;height: 200px;">
+                {% include "gdpr.html" %}
+              </div>
+	      <p>Having read this notice, <text id="undersigned"></text>, the undersigned, hereby:</p>
+              <select name="eu-consent">
+                <option disabled selected value></option>
+                <option value="yes">gives consent</option>
+                <option value="no">does not give consent</option>
+              </select>
+              <p>for the use of his/her special categories of sensitive personal data, and the transfer of special categories of sensitive personal data overseas, for the purpose outlined in this notice.</p>
+              <br>
+              <p>Date</p>
+              <p>Signature (type):<input type="text" name="signature"></p>
+              <br>
+              <p><b>If you have questions about this Consent, please contact:</b></p>
+              <p>NAME: Steve J. Anzalone</p>
+              <p>GEORGIA TECH UNIT: Compliance Officer, Office of Research Integrity Assurance</p>
+              <p>PHONE NUMBER: 470-572-3581</p>
+              <p>EMAIL: Steven.anzalone@gtrc.gatech.edu</p>
+	      <br>
+	      <br>
+              <input type="submit" name="confirm" value="Confirm"/>
+            </div>
+          </div>
+	</div>
+      </div>
+    </div>
   </div>
   <br>
-  <input type="submit" name="confirm" value="Confirm" />
+  <input type="submit" id="confirm" name="confirm" value="Confirm" style="display:none;"/>
 </form>
