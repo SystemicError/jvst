@@ -16,6 +16,7 @@
         <th>Last Name</th>
         <th>Admin?</th>
         <th>Consent results</th>
+        <th>Consent status</th>
         <th>QSetQueue</th>
         <th>Vocab Results</th>
         <th>Survey Results</th>
@@ -27,6 +28,7 @@
         <td><p>{{user.last_name}}</p></td>
         <td><p>{{user.admin}}</p></td>
         <td><p>{{user.consent_results}}</p></td>
+        <td><p>{{user.consent-status}}</p></td>
         <td><p>{{user.question_set_queue}}</p></td>
 	<td><p>{% for result in user.vocab_results %}
 		{% if result.grade %}

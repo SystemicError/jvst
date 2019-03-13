@@ -5,12 +5,10 @@ function showHide(id, trigger)
 {
   if(document.getElementById(id).value == trigger)
   {
-    document.getElementById(id + '-continued').style.visibility = 'visible';
-//    document.getElementById(id + '-continued').style.height = 200 + 'px';
+    document.getElementById(id + '-continued').style.display = 'inline';
   }
   else
-    document.getElementById(id + '-continued').style.visibility = 'hidden';
-//    document.getElementById(id + '-continued').style.height = 10 + 'px';
+    document.getElementById(id + '-continued').style.display = 'none';
 }
 </script>
 {% if session.identity %}
@@ -55,7 +53,7 @@ function showHide(id, trigger)
     {% endif %}
   {% endifequal %}
   {% ifequal consent "declined" %}
-    <p>Here's some copy indicating that you have declined consent and cannot take the test.</p>
+    <p>You have been entered into the raffle but have declined to take the JVST.</p>
   {% endifequal %}
   {% ifequal consent "none" %}
     {% include "consent.html" %}

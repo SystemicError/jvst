@@ -94,25 +94,31 @@
 
 (defn consent-status [user]
   "Returns a user consent status (agreed/declined/none)."
-  (let [consent-results (edn/read-string (:consent_results user))
-        irb-consent (= (:age-18+ consent-results)
-                       (:participate consent-results)
-                       (:read-understand consent-results)
-                       (:store-share consent-results)
-                       "yes")
-       ; dummy (println (str "cr:" consent-results))
-        ]
+  (let [consent-results (edn/read-string (:consent_results user))]
     (if consent-results
-      (if (or
-            (and (= (:eu-citizen consent-results)
-                    (:eu-consent consent-results)
-                    "yes")
-                 irb-consent)
-            (and (= (:eu-citizen consent-results) "no")
-                 irb-consent))
-        "agreed"
-        "declined")
-      "none")))
+      (if (and (= (:age-18+ consent-results)
+                  (:georgia consent-results)
+                  "yes")
+               (= (:ga-participate consent-results) "raffle"))
+        "raffle"  ; do not give jvst; just enter into raffle
+        (if (or (= (:age-18+ consent-results)
+                   (:georgia consent-results)
+                   (:ga-participate consent-results)
+                   (:ga-read-understand consent-results)
+                   (:ga-store-share consent-results)
+                   (:ga-eu-citizen consent-results)
+                   (:ga-eu-consent consent-results)
+                   "yes")
+                (and (= (:georgia consent-results) "no")
+                     (= (:age-18+ consent-results)
+                        (:read-understand consent-results)
+                        (:store-share consent-results)
+                        (:participate consent-results)
+                        (:eu-citizen consent-results)
+                        (:eu-consent consent-results))))
+          "record"  ; keep user data for study
+          "discard"))  ; discard all user data
+      "none"))) ; have not yet submitted consent page
 
 ;;; PAGES
 
@@ -128,8 +134,13 @@
   (let [session (request :session)
         email (if session (session :identity))
         user (if email (get-user email))
-        consent (if user (consent-status user))]
-  (layout/render "test.html" (into request {:consent consent}))))
+        consent (if user (consent-status user))
+        template-consent (case consent
+                           "record" "agreed"
+                           "discard" "agreed"
+                           "raffle" "declined"
+                           "none" "none")]
+  (layout/render "test.html" (into request {:consent template-consent}))))
 
 (def language-list ["English" "Mandarin Chinese" "Korean" "Spanish" "Arabic" "Armenian" "Bengali" "Burmese" "Cantonese" "Cherokee" "Dutch" "Farsi" "Filipino" "French" "German" "Greek" "Hakka" "Hawaiian" "Hebrew" "Hindi" "Hmon" "Ilocano" "Irish" "Japanese" "Javanese" "Khmer" "Kurdish" "Laotian" "Malay" "Marathi" "Navajo" "Nepali" "Persian" "Polish" "Portuguese" "Punjabi" "Romanian" "Russian" "Samoan" "Serbo-Croatian" "Sinhala" "Somali" "Sudanese" "Swahili" "Swedish" "Tagalog" "Taiwanese" "Tajik" "Tamil" "Telugu" "Thai" "Turkish" "Ukrainian" "Urdu" "Uzbek" "Vietnamese" "Welsh" "Wu Chinese" "Yiddish" "Yue Chinese"])
 
@@ -222,6 +233,8 @@
                   (let [results (edn/read-string (user :vocab_results))]
                     (assoc
                       (dissoc user :pass)
+                      :consent-status
+                      (consent-status user)
                       :vocab_results
                       (sort-by :id
                                (into []
